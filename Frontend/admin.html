@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <nav style="background-color: #ff6f61; padding: 1rem; display: flex; justify-content: space-between; align-items: center; color: white;">
+  <div style="font-weight: bold; font-size: 1.2rem;">🐾 Pawllos</div>
+  <div>
+    <a href="index.html" style="color: white; margin-right: 1rem; text-decoration: none;">Home</a>
+    <a href="adopt.html" style="color: white; margin-right: 1rem; text-decoration: none;">Adopt</a>
+    <a href="add_pet.html" style="color: white; text-decoration: none;">Admin</a>
+  </div>
+</nav>
+
+  <title>Add New Pet - Pawllos Admin</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #fffaf4;
+    }
+
+    header {
+      background-color: #ff6f61;
+      color: white;
+      text-align: center;
+      padding: 1rem 0;
+    }
+
+    .form-container {
+      max-width: 600px;
+      margin: 2rem auto;
+      background-color: white;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+      text-align: center;
+      color: #333;
+    }
+
+    label {
+      display: block;
+      margin-top: 1rem;
+      font-weight: bold;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 0.6rem;
+      margin-top: 0.3rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    button {
+      margin-top: 1.5rem;
+      width: 100%;
+      padding: 0.7rem;
+      background-color: #ff6f61;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #e55347;
+    }
+
+    .result {
+      margin-top: 2rem;
+      padding: 1rem;
+      background-color: #e8f5e9;
+      border-left: 5px solid #4caf50;
+    }
+
+    footer {
+      text-align: center;
+      padding: 1rem;
+      font-size: 0.8rem;
+      color: #555;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>🐾 Pawllos Admin Panel</h1>
+    <p>Add a new pet for adoption</p>
+  </header>
+
+  <div class="form-container">
+    <h2>Add Pet Details</h2>
+    <form id="petForm">
+      <label for="name">Pet Name</label>
+      <input type="text" id="name" required>
+
+      <label for="age">Age</label>
+      <input type="text" id="age" required>
+
+      <label for="type">Type</label>
+      <select id="type" required>
+        <option value="">--Select--</option>
+        <option value="dog">Dog</option>
+        <option value="cat">Cat</option>
+      </select>
+
+      <label for="location">Location</label>
+      <input type="text" id="location" required>
+
+      <label for="image">Image URL</label>
+      <input type="url" id="image" placeholder="https://example.com/pet.jpg" required>
+
+      <button type="submit">Add Pet</button>
+    </form>
+
+    <div id="result" class="result" style="display:none;">
+      <h3>Pet Added:</h3>
+      <p><strong>Name:</strong> <span id="resName"></span></p>
+      <p><strong>Age:</strong> <span id="resAge"></span></p>
+      <p><strong>Type:</strong> <span id="resType"></span></p>
+      <p><strong>Location:</strong> <span id="resLocation"></span></p>
+      <img id="resImage" src="" alt="Pet Image" style="max-width: 100%; height: auto; margin-top: 1rem; border-radius: 6px;">
+    </div>
+  </div>
+
+  <footer>
+    &copy; Pawllos Ltd. | Admin Portal
+  </footer>
+
+  <script>
+    const form = document.getElementById('petForm');
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+
+      const name = document.getElementById('name').value;
+      const age = document.getElementById('age').value;
+      const type = document.getElementById('type').value;
+      const location = document.getElementById('location').value;
+      const image = document.getElementById('image').value;
+
+      // Show result box
+      document.getElementById('resName').textContent = name;
+      document.getElementById('resAge').textContent = age;
+      document.getElementById('resType').textContent = type;
+      document.getElementById('resLocation').textContent = location;
+      document.getElementById('resImage').src = image;
+      document.getElementById('result').style.display = 'block';
+
+      // Optionally: push this to localStorage or backend later
+    });
+  </script>
+</body>
+</html>

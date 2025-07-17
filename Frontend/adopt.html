@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Adopt a Pet - Pawllos</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #fffaf4;
+    }
+
+    header {
+      background-color: #ff6f61;
+      color: white;
+      text-align: center;
+      padding: 1rem 0;
+    }
+
+    .form-container {
+      max-width: 600px;
+      margin: 2rem auto;
+      background-color: #ffffff;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    .form-container h2 {
+      margin-bottom: 1rem;
+      color: #333;
+    }
+
+    label {
+      display: block;
+      margin: 0.5rem 0 0.25rem;
+      font-weight: bold;
+    }
+
+    input, textarea {
+      width: 100%;
+      padding: 0.7rem;
+      margin-bottom: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 1rem;
+    }
+
+    button {
+      background-color: #ff6f61;
+      color: white;
+      padding: 0.7rem 1.5rem;
+      border: none;
+      border-radius: 4px;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #e55347;
+    }
+
+    footer {
+      text-align: center;
+      font-size: 0.8rem;
+      color: #555;
+      padding: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>🐾 Adopt a Friend</h1>
+    <p>You're one step closer to bringing joy home!</p>
+  </header>
+
+  <div class="form-container">
+    <h2>Adoption Interest Form</h2>
+    <form id="adoptForm" method="POST" action="#">
+      <label for="petName">Pet Name</label>
+      <input type="text" id="petName" name="petName" readonly>
+
+      <label for="yourName">Your Name</label>
+      <input type="text" id="yourName" name="yourName" required>
+
+      <label for="email">Email</label>
+      <input type="email" id="email" name="email" required>
+
+      <label for="message">Why do you want to adopt this pet?</label>
+      <textarea id="message" name="message" rows="4" required></textarea>
+
+      <button type="submit">Submit</button>
+    </form>
+  </div>
+
+  <footer>
+    &copy; Pawllos Ltd. | HGP | 2025
+  </footer>
+
+  <script>
+    // Read pet name or ID from URL (e.g. ?pet=Buddy)
+    const urlParams = new URLSearchParams(window.location.search);
+    const petId = urlParams.get('pet');
+    const petData = {
+      1: "Buddy",
+      2: "Luna",
+      3: "Max"
+    };
+
+    const petName = petData[petId] || "Unknown Pet";
+    document.getElementById("petName").value = petName;
+  </script>
+</body>
+</html>
