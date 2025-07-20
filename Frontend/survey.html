@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Pet Handling Survey | PAWLLOS</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #fff3f2;
+      padding: 2rem;
+      margin: 0;
+    }
+
+    .container {
+      max-width: 600px;
+      background-color: white;
+      margin: auto;
+      padding: 2rem;
+      border-radius: 15px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+      text-align: center;
+      color: #ff6f61;
+    }
+
+    .question {
+      margin-bottom: 1.5rem;
+    }
+
+    .question label {
+      font-weight: 500;
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+
+    .question input[type="radio"] {
+      margin-right: 10px;
+    }
+
+    button {
+      width: 100%;
+      padding: 0.75rem;
+      background-color: #ff6f61;
+      border: none;
+      color: white;
+      font-size: 1rem;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-top: 1.5rem;
+    }
+
+    button:hover {
+      background-color: #ff3b2e;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Know Your Pet Style</h2>
+
+    <form id="surveyForm">
+      <div class="question">
+        <label>1. How much time can you spend with your pet daily?</label>
+        <input type="radio" name="q1" value="care"> More than 4 hours<br>
+        <input type="radio" name="q1" value="balanced"> 2–4 hours<br>
+        <input type="radio" name="q1" value="guard"> Less than 2 hours
+      </div>
+
+      <div class="question">
+        <label>2. What's your main reason for adopting?</label>
+        <input type="radio" name="q2" value="emotional"> Emotional companionship<br>
+        <input type="radio" name="q2" value="guard"> Security or alert pet<br>
+        <input type="radio" name="q2" value="care"> Giving care to abandoned pets
+      </div>
+
+      <div class="question">
+        <label>3. How emotionally attached do you get to pets?</label>
+        <input type="radio" name="q3" value="emotional"> Very attached<br>
+        <input type="radio" name="q3" value="balanced"> Somewhat attached<br>
+        <input type="radio" name="q3" value="guard"> I treat them as protectors
+      </div>
+
+      <div class="question">
+        <label>4. What type of pet do you prefer?</label>
+        <input type="radio" name="q4" value="care"> Calm and friendly<br>
+        <input type="radio" name="q4" value="guard"> Watchful and alert<br>
+        <input type="radio" name="q4" value="emotional"> Playful and expressive
+      </div>
+
+      <button type="submit">Submit Survey</button>
+    </form>
+  </div>
+
+  <script>
+    document.getElementById("surveyForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+
+      const responses = Array.from(document.querySelectorAll("input[type='radio']:checked")).map(i => i.value);
+
+      const score = { care: 0, guard: 0, emotional: 0, balanced: 0 };
+
+      responses.forEach(val => {
+        score[val]++;
+      });
+
+      let result = Object.keys(score).reduce((a, b) => score[a] > score[b] ? a : b);
+
+      // Store result in local storage for profile use (or send to backend)
+      localStorage.setItem("petStyle", result);
+
+      alert("Survey submitted! You're a " + result.replace("-", " ") + " pet adopter.");
+
+      window.location.href = "index.html";
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Sign Up | Pawllos</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #fff3f2;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .signup-box {
+      background-color: white;
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: 0 0 12px rgba(0, 0, 0, 0.15);
+      width: 350px;
+      text-align: center;
+    }
+    h2 {
+      margin-bottom: 1.5rem;
+      color: #ff6f61;
+    }
+    input {
+      width: 100%;
+      padding: 0.6rem;
+      margin: 0.6rem 0;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+    button {
+      width: 100%;
+      background-color: #ff6f61;
+      color: white;
+      border: none;
+      padding: 0.75rem;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-top: 1rem;
+      font-weight: bold;
+    }
+    button:hover {
+      background-color: #ff3b2e;
+    }
+    p {
+      font-size: 0.9rem;
+      color: red;
+      margin-top: 0.5rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="signup-box">
+    <h2>Create Account</h2>
+    <input type="text" id="name" placeholder="Full Name" required />
+    <input type="email" id="email" placeholder="Email" required />
+    <input type="tel" id="phone" placeholder="Phone Number" required />
+    <input type="password" id="password" placeholder="Password" required />
+    <button onclick="signup()">Sign Up</button>
+    <p id="error"></p>
+  </div>
+
+  <script>
+    function signup() {
+      const name = document.getElementById("name").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const phone = document.getElementById("phone").value.trim();
+      const password = document.getElementById("password").value;
+
+      if (!name || !email || !phone || !password) {
+        document.getElementById("error").textContent = "Please fill all fields.";
+        return;
+      }
+
+      // Save user data temporarily (simulate backend)
+      localStorage.setItem("userName", name);
+      localStorage.setItem("userEmail", email);
+      localStorage.setItem("userPhone", phone);
+      localStorage.setItem("userPassword", password);  // Optional; usually you'd hash
+
+      // Redirect to survey page
+      window.location.href = "survey.html";
+    }
+  </script>
+</body>
+</html>
