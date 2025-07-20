@@ -3,70 +3,98 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Admin Login | Pawllos</title>
+  <title>Login - Pawllos</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background-color: #fff3f2;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
+      font-family: 'Segoe UI', sans-serif;
       margin: 0;
+      padding: 0;
+      background-color: #fffaf4;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
     }
+
     .login-box {
-      background-color: white;
+      background: white;
       padding: 2rem;
       border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-      width: 300px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 400px;
       text-align: center;
     }
-    h2 {
-      margin-bottom: 1rem;
+
+    h1 {
       color: #ff6f61;
+      margin-bottom: 1rem;
     }
-    input {
+
+    input[type="email"],
+    input[type="password"] {
       width: 100%;
-      padding: 0.5rem;
-      margin: 0.5rem 0;
+      padding: 0.8rem;
+      margin-bottom: 1rem;
       border: 1px solid #ccc;
-      border-radius: 5px;
+      border-radius: 6px;
+      font-size: 1rem;
     }
+
     button {
-      width: 100%;
       background-color: #ff6f61;
       color: white;
       border: none;
-      padding: 0.7rem;
-      border-radius: 5px;
+      padding: 0.8rem 2rem;
+      border-radius: 6px;
+      font-size: 1rem;
       cursor: pointer;
-      margin-top: 1rem;
     }
+
     button:hover {
-      background-color: #ff3b2e;
+      background-color: #e55347;
+    }
+
+    .signup-link {
+      margin-top: 1rem;
+      font-size: 0.9rem;
+    }
+
+    .signup-link a {
+      color: #ff6f61;
+      text-decoration: none;
+    }
+
+    .signup-link a:hover {
+      text-decoration: underline;
     }
   </style>
 </head>
 <body>
   <div class="login-box">
-    <h2>Admin Login</h2>
-    <input type="text" id="username" placeholder="Username" required />
-    <input type="password" id="password" placeholder="Password" required />
-    <button onclick="login()">Login</button>
-    <p id="error" style="color: red; font-size: 0.9rem;"></p>
+    <h1>🐾 Pawllos Login</h1>
+    <form onsubmit="handleLogin(event)">
+      <input type="email" id="email" placeholder="Email" required />
+      <input type="password" id="password" placeholder="Password" required />
+      <button type="submit">Login</button>
+    </form>
+    <div class="signup-link">
+      Don't have an account? <a href="signup.html">Sign up here</a>
+    </div>
   </div>
 
   <script>
-    function login() {
-      const user = document.getElementById("username").value;
-      const pass = document.getElementById("password").value;
+    function handleLogin(event) {
+      event.preventDefault();
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
 
-      // Simple hardcoded login (can be replaced with backend check)
-      if (user === "admin" && pass === "paw123") {
+      // For now, simulate a successful login (replace with real auth later)
+      if (email && password) {
+        localStorage.setItem("user", JSON.stringify({ email }));
         window.location.href = "index.html";
       } else {
-        document.getElementById("error").textContent = "Invalid credentials.";
+        alert("Invalid login");
       }
     }
   </script>

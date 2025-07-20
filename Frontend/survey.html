@@ -3,91 +3,99 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Pet Handling Survey | PAWLLOS</title>
+  <title>User Survey | PAWLLOS</title>
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
       background-color: #fff3f2;
-      padding: 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
       margin: 0;
     }
 
-    .container {
-      max-width: 600px;
+    .survey-container {
       background-color: white;
-      margin: auto;
       padding: 2rem;
-      border-radius: 15px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 500px;
     }
 
     h2 {
       text-align: center;
       color: #ff6f61;
-    }
-
-    .question {
       margin-bottom: 1.5rem;
     }
 
-    .question label {
-      font-weight: 500;
-      display: block;
-      margin-bottom: 0.5rem;
+    .question {
+      margin-bottom: 1.25rem;
     }
 
-    .question input[type="radio"] {
-      margin-right: 10px;
+    .question label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+    }
+
+    .question select {
+      width: 100%;
+      padding: 0.6rem;
+      border: 1px solid #ccc;
+      border-radius: 8px;
     }
 
     button {
+      margin-top: 1.5rem;
       width: 100%;
       padding: 0.75rem;
       background-color: #ff6f61;
-      border: none;
       color: white;
+      border: none;
       font-size: 1rem;
       border-radius: 8px;
       cursor: pointer;
-      margin-top: 1.5rem;
     }
 
     button:hover {
-      background-color: #ff3b2e;
+      background-color: #e9594e;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h2>Know Your Pet Style</h2>
-
+  <div class="survey-container">
+    <h2>Your Pet-Handling Style</h2>
     <form id="surveyForm">
       <div class="question">
-        <label>1. How much time can you spend with your pet daily?</label>
-        <input type="radio" name="q1" value="care"> More than 4 hours<br>
-        <input type="radio" name="q1" value="balanced"> 2–4 hours<br>
-        <input type="radio" name="q1" value="guard"> Less than 2 hours
+        <label for="q1">How do you view pets in your life?</label>
+        <select id="q1" required>
+          <option value="">Select one</option>
+          <option value="emotional">They're part of my emotional core</option>
+          <option value="care">I enjoy taking care of them</option>
+          <option value="guard">Mostly for safety/guarding</option>
+        </select>
       </div>
 
       <div class="question">
-        <label>2. What's your main reason for adopting?</label>
-        <input type="radio" name="q2" value="emotional"> Emotional companionship<br>
-        <input type="radio" name="q2" value="guard"> Security or alert pet<br>
-        <input type="radio" name="q2" value="care"> Giving care to abandoned pets
+        <label for="q2">How often can you spend time with your pet daily?</label>
+        <select id="q2" required>
+          <option value="">Select one</option>
+          <option value="emotional">4+ hours – we’re companions</option>
+          <option value="care">1-3 hours – for play/walk/feed</option>
+          <option value="guard">Less than 1 hour – functional need</option>
+        </select>
       </div>
 
       <div class="question">
-        <label>3. How emotionally attached do you get to pets?</label>
-        <input type="radio" name="q3" value="emotional"> Very attached<br>
-        <input type="radio" name="q3" value="balanced"> Somewhat attached<br>
-        <input type="radio" name="q3" value="guard"> I treat them as protectors
-      </div>
-
-      <div class="question">
-        <label>4. What type of pet do you prefer?</label>
-        <input type="radio" name="q4" value="care"> Calm and friendly<br>
-        <input type="radio" name="q4" value="guard"> Watchful and alert<br>
-        <input type="radio" name="q4" value="emotional"> Playful and expressive
+        <label for="q3">How would you handle a pet's illness?</label>
+        <select id="q3" required>
+          <option value="">Select one</option>
+          <option value="emotional">Give full attention, visit vet</option>
+          <option value="care">Provide basic meds and rest</option>
+          <option value="guard">Wait and watch approach</option>
+        </select>
       </div>
 
       <button type="submit">Submit Survey</button>
@@ -95,25 +103,26 @@
   </div>
 
   <script>
-    document.getElementById("surveyForm").addEventListener("submit", function(e) {
+    document.getElementById("surveyForm").addEventListener("submit", function (e) {
       e.preventDefault();
 
-      const responses = Array.from(document.querySelectorAll("input[type='radio']:checked")).map(i => i.value);
+      const q1 = document.getElementById("q1").value;
+      const q2 = document.getElementById("q2").value;
+      const q3 = document.getElementById("q3").value;
 
-      const score = { care: 0, guard: 0, emotional: 0, balanced: 0 };
+      const scores = { emotional: 0, care: 0, guard: 0 };
+      scores[q1]++;
+      scores[q2]++;
+      scores[q3]++;
 
-      responses.forEach(val => {
-        score[val]++;
-      });
+      const outcome = Object.entries(scores).reduce((a, b) => (a[1] > b[1] ? a : b))[0];
 
-      let result = Object.keys(score).reduce((a, b) => score[a] > score[b] ? a : b);
+      const existing = JSON.parse(localStorage.getItem("pawllos_user")) || {};
+      existing.surveyStyle = outcome;
+      localStorage.setItem("pawllos_user", JSON.stringify(existing));
 
-      // Store result in local storage for profile use (or send to backend)
-      localStorage.setItem("petStyle", result);
-
-      alert("Survey submitted! You're a " + result.replace("-", " ") + " pet adopter.");
-
-      window.location.href = "index.html";
+      alert("Survey completed! Style detected: " + outcome + ". Redirecting to homepage...");
+      window.location.href = "index.html"; // Change if homepage is different
     });
   </script>
 </body>

@@ -2,151 +2,141 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>PAWLLOS - Add Pet</title>
-  <link rel="stylesheet" href="styles.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Add Pet | PAWLLOS</title>
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
-      margin: 0;
-      background-color: #fffaf4;
-    }
-
-    header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background-color: #ff6f61;
-      color: white;
-      padding: 1rem 2rem;
-    }
-
-    .nav-tabs a {
-      margin: 0 1rem;
-      text-decoration: none;
-      color: white;
-      font-weight: bold;
-      padding: 0.3rem 0.8rem;
-      border-radius: 6px;
-    }
-
-    .nav-tabs a.active {
-      background-color: #fff;
-      color: #ff6f61;
-    }
-
-    .avatar {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      cursor: pointer;
-    }
-
-    .form-container {
-      max-width: 600px;
-      background-color: white;
-      margin: 2rem auto;
+      background-color: #f9f9f9;
       padding: 2rem;
-      border-radius: 12px;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: auto;
+      background: white;
+      padding: 2rem;
+      border-radius: 15px;
       box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
 
-    .form-container h2 {
+    h2 {
       text-align: center;
-      margin-bottom: 1.5rem;
+      color: #ff6f61;
     }
 
-    .form-container label {
+    label {
       display: block;
-      margin-top: 1rem;
-      font-weight: bold;
+      margin: 10px 0 5px;
+      font-weight: 500;
     }
 
-    .form-container input, .form-container textarea, .form-container select {
+    input, select, textarea {
       width: 100%;
-      padding: 0.8rem;
-      margin-top: 0.3rem;
+      padding: 8px;
+      margin-bottom: 1rem;
       border: 1px solid #ccc;
-      border-radius: 6px;
+      border-radius: 5px;
     }
 
-    .form-container button {
+    button {
+      width: 100%;
+      padding: 10px;
       background-color: #ff6f61;
       color: white;
       border: none;
-      padding: 0.8rem 1.5rem;
-      margin-top: 1.5rem;
-      width: 100%;
-      border-radius: 6px;
+      border-radius: 8px;
+      font-size: 1rem;
       cursor: pointer;
     }
 
-    .form-container button:hover {
-      background-color: #e55347;
-    }
-
-    .back-btn {
-      display: block;
-      text-align: center;
-      margin-top: 1.5rem;
-      text-decoration: none;
-      color: #ff6f61;
-      font-weight: bold;
+    button:hover {
+      background-color: #ff3b2e;
     }
   </style>
 </head>
 <body>
-
-  <header>
-    <div class="logo"><h2>🐾 PAWLLOS</h2></div>
-    <nav class="nav-tabs">
-      <a href="index.html">HOME</a>
-      <a href="add_pet.html" class="active">ADD PET</a>
-      <a href="about.html">ABOUT</a>
-    </nav>
-    <img src="avatar.png" alt="User" class="avatar" onclick="goToProfile()" />
-  </header>
-
-  <div class="form-container">
+  <div class="container">
     <h2>Add a Pet for Adoption</h2>
-    <form id="addPetForm">
-      <label for="petName">Pet Name</label>
-      <input type="text" id="petName" required />
 
-      <label for="petType">Pet Type</label>
-      <select id="petType" required>
-        <option value="">Select Type</option>
-        <option>Dog</option>
-        <option>Cat</option>
-        <option>Rabbit</option>
-        <option>Other</option>
+    <form id="addPetForm">
+      <label for="name">Pet Name</label>
+      <input type="text" id="name" name="name" required>
+
+      <label for="age">Pet Age</label>
+      <input type="number" id="age" name="age" required>
+
+      <label for="type">Type</label>
+      <select id="type" name="type" required>
+        <option value="">Select type</option>
+        <option value="Dog">Dog</option>
+        <option value="Cat">Cat</option>
+        <option value="Other">Other</option>
       </select>
 
-      <label for="petAge">Age (in years)</label>
-      <input type="number" id="petAge" min="0" required />
-
       <label for="description">Description</label>
-      <textarea id="description" rows="3" required></textarea>
+      <textarea id="description" name="description" rows="3" required></textarea>
 
-      <label for="petImage">Pet Image</label>
-      <input type="file" id="petImage" accept="image/*" required />
+      <!-- Pet Behavior Survey -->
+      <label>How social is this pet?</label>
+      <select name="social">
+        <option value="care">Very friendly</option>
+        <option value="balanced">Friendly to some extent</option>
+        <option value="guard">Not very social</option>
+      </select>
 
-      <button type="submit">Post Pet</button>
+      <label>How alert or protective is this pet?</label>
+      <select name="alertness">
+        <option value="guard">Very alert and protective</option>
+        <option value="balanced">Moderately alert</option>
+        <option value="care">Calm and gentle</option>
+      </select>
+
+      <label>How does this pet behave emotionally?</label>
+      <select name="emotion">
+        <option value="emotional">Playful and attached</option>
+        <option value="balanced">Balanced</option>
+        <option value="guard">Detached or independent</option>
+      </select>
+
+      <button type="submit">Add Pet</button>
     </form>
-
-    <a class="back-btn" href="index.html">← Back to Home</a>
   </div>
 
   <script>
-    function goToProfile() {
-      window.location.href = "profile.html";
-    }
-
     document.getElementById("addPetForm").addEventListener("submit", function(e) {
       e.preventDefault();
-      alert("Pet posted successfully! (Form handling not implemented)");
+
+      const form = e.target;
+      const petData = {
+        name: form.name.value,
+        age: form.age.value,
+        type: form.type.value,
+        description: form.description.value,
+        score: {
+          care: 0,
+          guard: 0,
+          emotional: 0,
+          balanced: 0
+        }
+      };
+
+      // Count style preference score
+      petData.score[form.social.value]++;
+      petData.score[form.alertness.value]++;
+      petData.score[form.emotion.value]++;
+
+      // Determine dominant category
+      const result = Object.keys(petData.score).reduce((a, b) => petData.score[a] > petData.score[b] ? a : b);
+      petData.petStyle = result;
+
+      // Send this to backend (replace this with actual request)
+      console.log("Pet Data Submitted:", petData);
+
+      alert("Pet added with behavior type: " + result);
+
       window.location.href = "index.html";
     });
   </script>
-
 </body>
 </html>
