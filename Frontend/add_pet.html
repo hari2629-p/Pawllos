@@ -1,141 +1,64 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Add Pet | PAWLLOS</title>
-  <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background-color: #f9f9f9;
-      padding: 2rem;
-    }
-
-    .container {
-      max-width: 600px;
-      margin: auto;
-      background: white;
-      padding: 2rem;
-      border-radius: 15px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    }
-
-    h2 {
-      text-align: center;
-      color: #ff6f61;
-    }
-
-    label {
-      display: block;
-      margin: 10px 0 5px;
-      font-weight: 500;
-    }
-
-    input, select, textarea {
-      width: 100%;
-      padding: 8px;
-      margin-bottom: 1rem;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-    }
-
-    button {
-      width: 100%;
-      padding: 10px;
-      background-color: #ff6f61;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      font-size: 1rem;
-      cursor: pointer;
-    }
-
-    button:hover {
-      background-color: #ff3b2e;
-    }
-  </style>
+  <meta charset="UTF-8">
+  <title>Add Pet | Pawllos</title>
+  <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js"></script>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyBX10ONUiCc9NPrOmjFsC3Dq83u8GxwaK0",
+      authDomain: "pawllos-c985f.firebaseapp.com",
+      projectId: "pawllos-c985f",
+      storageBucket: "pawllos-c985f.firebasestorage.app",
+      messagingSenderId: "605956154730",
+      appId: "1:605956154730:web:d0df6d427f92b581467113"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const auth = firebase.auth();
+  </script>
 </head>
 <body>
-  <div class="container">
-    <h2>Add a Pet for Adoption</h2>
-
-    <form id="addPetForm">
-      <label for="name">Pet Name</label>
-      <input type="text" id="name" name="name" required>
-
-      <label for="age">Pet Age</label>
-      <input type="number" id="age" name="age" required>
-
-      <label for="type">Type</label>
-      <select id="type" name="type" required>
-        <option value="">Select type</option>
-        <option value="Dog">Dog</option>
-        <option value="Cat">Cat</option>
-        <option value="Other">Other</option>
-      </select>
-
-      <label for="description">Description</label>
-      <textarea id="description" name="description" rows="3" required></textarea>
-
-      <!-- Pet Behavior Survey -->
-      <label>How social is this pet?</label>
-      <select name="social">
-        <option value="care">Very friendly</option>
-        <option value="balanced">Friendly to some extent</option>
-        <option value="guard">Not very social</option>
-      </select>
-
-      <label>How alert or protective is this pet?</label>
-      <select name="alertness">
-        <option value="guard">Very alert and protective</option>
-        <option value="balanced">Moderately alert</option>
-        <option value="care">Calm and gentle</option>
-      </select>
-
-      <label>How does this pet behave emotionally?</label>
-      <select name="emotion">
-        <option value="emotional">Playful and attached</option>
-        <option value="balanced">Balanced</option>
-        <option value="guard">Detached or independent</option>
-      </select>
-
-      <button type="submit">Add Pet</button>
-    </form>
-  </div>
+  <h2>Add a Pet</h2>
+  <form id="petForm">
+    <input type="text" id="name" placeholder="Pet Name" required><br>
+    <input type="text" id="breed" placeholder="Breed" required><br>
+    <input type="text" id="age" placeholder="Age" required><br>
+    <input type="text" id="type" placeholder="Type (dog/cat/etc.)" required><br>
+    <input type="text" id="location" placeholder="Location" required><br>
+    <input type="text" id="style" placeholder="Pet Style (care_oriented/guard_oriented/emotional_core)" required><br>
+    <input type="url" id="image" placeholder="Image URL" required><br>
+    <button type="submit">Add Pet</button>
+  </form>
 
   <script>
-    document.getElementById("addPetForm").addEventListener("submit", function(e) {
+    document.getElementById("petForm").addEventListener("submit", function(e) {
       e.preventDefault();
 
-      const form = e.target;
-      const petData = {
-        name: form.name.value,
-        age: form.age.value,
-        type: form.type.value,
-        description: form.description.value,
-        score: {
-          care: 0,
-          guard: 0,
-          emotional: 0,
-          balanced: 0
+      auth.onAuthStateChanged(user => {
+        if (user) {
+          const pet = {
+            name: document.getElementById("name").value,
+            breed: document.getElementById("breed").value,
+            age: document.getElementById("age").value,
+            type: document.getElementById("type").value,
+            location: document.getElementById("location").value,
+            style: document.getElementById("style").value,
+            image: document.getElementById("image").value,
+            addedBy: user.uid,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+          };
+
+          db.collection("pets").add(pet).then(() => {
+            alert("Pet added successfully!");
+            window.location.href = "index.html";
+          }).catch(err => alert("Failed to add pet: " + err.message));
+        } else {
+          alert("You must be logged in to add a pet.");
         }
-      };
-
-      // Count style preference score
-      petData.score[form.social.value]++;
-      petData.score[form.alertness.value]++;
-      petData.score[form.emotion.value]++;
-
-      // Determine dominant category
-      const result = Object.keys(petData.score).reduce((a, b) => petData.score[a] > petData.score[b] ? a : b);
-      petData.petStyle = result;
-
-      // Send this to backend (replace this with actual request)
-      console.log("Pet Data Submitted:", petData);
-
-      alert("Pet added with behavior type: " + result);
-
-      window.location.href = "index.html";
+      });
     });
   </script>
 </body>

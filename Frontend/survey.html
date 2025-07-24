@@ -1,128 +1,56 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>User Survey | PAWLLOS</title>
-  <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background-color: #fff3f2;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      margin: 0;
-    }
-
-    .survey-container {
-      background-color: white;
-      padding: 2rem;
-      border-radius: 12px;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-      width: 100%;
-      max-width: 500px;
-    }
-
-    h2 {
-      text-align: center;
-      color: #ff6f61;
-      margin-bottom: 1.5rem;
-    }
-
-    .question {
-      margin-bottom: 1.25rem;
-    }
-
-    .question label {
-      display: block;
-      margin-bottom: 0.5rem;
-      font-weight: 500;
-    }
-
-    .question select {
-      width: 100%;
-      padding: 0.6rem;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-    }
-
-    button {
-      margin-top: 1.5rem;
-      width: 100%;
-      padding: 0.75rem;
-      background-color: #ff6f61;
-      color: white;
-      border: none;
-      font-size: 1rem;
-      border-radius: 8px;
-      cursor: pointer;
-    }
-
-    button:hover {
-      background-color: #e9594e;
-    }
-  </style>
+  <meta charset="UTF-8">
+  <title>User Survey | Pawllos</title>
+  <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js"></script>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyBX10ONUiCc9NPrOmjFsC3Dq83u8GxwaK0",
+      authDomain: "pawllos-c985f.firebaseapp.com",
+      projectId: "pawllos-c985f",
+      storageBucket: "pawllos-c985f.firebasestorage.app",
+      messagingSenderId: "605956154730",
+      appId: "1:605956154730:web:d0df6d427f92b581467113"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const auth = firebase.auth();
+  </script>
 </head>
 <body>
-  <div class="survey-container">
-    <h2>Your Pet-Handling Style</h2>
-    <form id="surveyForm">
-      <div class="question">
-        <label for="q1">How do you view pets in your life?</label>
-        <select id="q1" required>
-          <option value="">Select one</option>
-          <option value="emotional">They're part of my emotional core</option>
-          <option value="care">I enjoy taking care of them</option>
-          <option value="guard">Mostly for safety/guarding</option>
-        </select>
-      </div>
-
-      <div class="question">
-        <label for="q2">How often can you spend time with your pet daily?</label>
-        <select id="q2" required>
-          <option value="">Select one</option>
-          <option value="emotional">4+ hours – we’re companions</option>
-          <option value="care">1-3 hours – for play/walk/feed</option>
-          <option value="guard">Less than 1 hour – functional need</option>
-        </select>
-      </div>
-
-      <div class="question">
-        <label for="q3">How would you handle a pet's illness?</label>
-        <select id="q3" required>
-          <option value="">Select one</option>
-          <option value="emotional">Give full attention, visit vet</option>
-          <option value="care">Provide basic meds and rest</option>
-          <option value="guard">Wait and watch approach</option>
-        </select>
-      </div>
-
-      <button type="submit">Submit Survey</button>
-    </form>
-  </div>
+  <h2>Tell Us About Your Pet Preferences</h2>
+  <form id="surveyForm">
+    <label>Your Pet Handling Style:</label>
+    <select id="style" required>
+      <option value="">--Select--</option>
+      <option value="care_oriented">Care-Oriented</option>
+      <option value="guard_oriented">Guard-Oriented</option>
+      <option value="emotional_core">Emotional Core</option>
+    </select>
+    <br><br>
+    <button type="submit">Submit</button>
+  </form>
 
   <script>
-    document.getElementById("surveyForm").addEventListener("submit", function (e) {
+    document.getElementById("surveyForm").addEventListener("submit", function(e) {
       e.preventDefault();
+      const style = document.getElementById("style").value;
 
-      const q1 = document.getElementById("q1").value;
-      const q2 = document.getElementById("q2").value;
-      const q3 = document.getElementById("q3").value;
-
-      const scores = { emotional: 0, care: 0, guard: 0 };
-      scores[q1]++;
-      scores[q2]++;
-      scores[q3]++;
-
-      const outcome = Object.entries(scores).reduce((a, b) => (a[1] > b[1] ? a : b))[0];
-
-      const existing = JSON.parse(localStorage.getItem("pawllos_user")) || {};
-      existing.surveyStyle = outcome;
-      localStorage.setItem("pawllos_user", JSON.stringify(existing));
-
-      alert("Survey completed! Style detected: " + outcome + ". Redirecting to homepage...");
-      window.location.href = "index.html"; // Change if homepage is different
+      auth.onAuthStateChanged(user => {
+        if (user) {
+          db.collection("users").doc(user.uid).update({
+            surveyStyle: style
+          }).then(() => {
+            alert("Survey submitted successfully!");
+            window.location.href = "index.html";
+          });
+        } else {
+          alert("You must be logged in to submit the survey.");
+        }
+      });
     });
   </script>
 </body>

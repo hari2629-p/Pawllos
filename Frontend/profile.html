@@ -1,153 +1,83 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>PAWLLOS - Profile</title>
-  <link rel="stylesheet" href="styles.css" />
+  <meta charset="UTF-8">
+  <title>My Profile | Pawllos</title>
+  <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js"></script>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyBX10ONUiCc9NPrOmjFsC3Dq83u8GxwaK0",
+      authDomain: "pawllos-c985f.firebaseapp.com",
+      projectId: "pawllos-c985f",
+      storageBucket: "pawllos-c985f.firebasestorage.app",
+      messagingSenderId: "605956154730",
+      appId: "1:605956154730:web:d0df6d427f92b581467113"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const auth = firebase.auth();
+  </script>
   <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      margin: 0;
-      background-color: #fffaf4;
-    }
-
-    header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background-color: #ff6f61;
-      color: white;
-      padding: 1rem 2rem;
-    }
-
-    .nav-tabs a {
-      margin: 0 1rem;
-      text-decoration: none;
-      color: white;
-      font-weight: bold;
-      padding: 0.3rem 0.8rem;
-      border-radius: 6px;
-    }
-
-    .avatar {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      cursor: pointer;
-    }
-
-    .profile-container {
-      max-width: 800px;
-      margin: 2rem auto;
-      background: white;
-      padding: 2rem;
-      border-radius: 12px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    }
-
-    .profile-header {
-      display: flex;
-      align-items: center;
-      margin-bottom: 2rem;
-    }
-
-    .profile-header img {
-      width: 100px;
-      height: 100px;
-      border-radius: 50%;
-      margin-right: 2rem;
-    }
-
-    .profile-header div {
-      line-height: 1.5;
-    }
-
-    h3 {
-      margin-top: 2rem;
-      border-bottom: 2px solid #ff6f61;
-      padding-bottom: 0.3rem;
-      color: #ff6f61;
-    }
-
-    .pet-list {
-      margin-top: 1rem;
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-      gap: 1rem;
-    }
-
-    .pet-card {
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      padding: 0.8rem;
-      background: #fffaf4;
-      text-align: center;
-    }
-
-    .pet-card img {
-      max-width: 100%;
-      height: 100px;
-      object-fit: cover;
-      border-radius: 6px;
-    }
-
-    .back-btn {
-      display: block;
-      text-align: center;
-      margin-top: 2rem;
-      text-decoration: none;
-      color: #ff6f61;
-      font-weight: bold;
-    }
+    body { font-family: Arial; padding: 20px; }
+    .card { background: #fff3f2; padding: 20px; margin-bottom: 20px; border-radius: 10px; box-shadow: 0 1px 5px rgba(0,0,0,0.1); }
+    h2 { margin-top: 0; }
+    .list { margin-left: 20px; }
   </style>
 </head>
 <body>
+  <h2>My Profile</h2>
+  <div id="userDetails" class="card"></div>
+  <div id="postedPets" class="card"></div>
+  <div id="adoptionHistory" class="card"></div>
 
-  <header>
-    <div class="logo"><h2>🐾 PAWLLOS</h2></div>
-    <nav class="nav-tabs">
-      <a href="index.html">HOME</a>
-      <a href="add_pet.html">ADD PET</a>
-      <a href="about.html">ABOUT</a>
-    </nav>
-    <img src="avatar.png" alt="User" class="avatar" />
-  </header>
+  <script>
+    auth.onAuthStateChanged(user => {
+      if (user) {
+        const uid = user.uid;
 
-  <div class="profile-container">
-    <div class="profile-header">
-      <img src="avatar.png" alt="Profile" />
-      <div>
-        <h2>Harigovind P Nair</h2>
-        <p>📞 +91 98765 43210</p>
-        <p>✉️ harigovind@example.com</p>
-      </div>
-    </div>
+        db.collection("users").doc(uid).get().then(doc => {
+          const data = doc.data();
+          document.getElementById("userDetails").innerHTML = `
+            <h3>Account Info</h3>
+            <p><strong>Name:</strong> ${data.name}</p>
+            <p><strong>Email:</strong> ${data.email}</p>
+            <p><strong>Phone:</strong> ${data.phone}</p>
+            <p><strong>Style:</strong> ${data.surveyStyle || 'Not Taken'}</p>
+            <img src="${data.profilePic}" alt="Profile Pic" style="max-width: 150px; border-radius: 8px;">
+          `;
+        });
 
-    <h3>Pets You Posted</h3>
-    <div class="pet-list">
-      <div class="pet-card">
-        <img src="dog1.jpg" alt="Pet" />
-        <p><strong>Tommy</strong></p>
-        <p>2 years | Dog</p>
-      </div>
-      <div class="pet-card">
-        <img src="cat1.jpg" alt="Pet" />
-        <p><strong>Whiskers</strong></p>
-        <p>1 year | Cat</p>
-      </div>
-    </div>
+        db.collection("pets").where("addedBy", "==", uid).get().then(snapshot => {
+          let html = '<h3>Pets You Posted</h3><ul class="list">';
+          snapshot.forEach(doc => {
+            const p = doc.data();
+            html += `<li>${p.name} - ${p.type} (${p.breed})</li>`;
+          });
+          html += '</ul>';
+          document.getElementById("postedPets").innerHTML = html;
+        });
 
-    <h3>Your Adoption History</h3>
-    <div class="pet-list">
-      <div class="pet-card">
-        <img src="rabbit1.jpg" alt="Pet" />
-        <p><strong>Fluffy</strong></p>
-        <p>Adopted: Jan 2024</p>
-      </div>
-    </div>
-
-    <a class="back-btn" href="index.html">← Back to Home</a>
-  </div>
-
+        db.collection("adoptions").where("userId", "==", uid).get().then(snapshot => {
+          let html = '<h3>Your Adoptions</h3><ul class="list">';
+          const fetches = [];
+          snapshot.forEach(doc => {
+            const petId = doc.data().petId;
+            fetches.push(
+              db.collection("pets").doc(petId).get().then(petDoc => {
+                const pet = petDoc.data();
+                html += `<li>${pet.name} - ${pet.type} (${pet.breed})</li>`;
+              })
+            );
+          });
+          Promise.all(fetches).then(() => {
+            html += '</ul>';
+            document.getElementById("adoptionHistory").innerHTML = html;
+          });
+        });
+      }
+    });
+  </script>
 </body>
 </html>

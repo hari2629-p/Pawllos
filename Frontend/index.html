@@ -1,133 +1,76 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <title>PAWLLOS - Home</title>
-  <link rel="stylesheet" href="styles.css" />
+  <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js"></script>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyBX10ONUiCc9NPrOmjFsC3Dq83u8GxwaK0",
+      authDomain: "pawllos-c985f.firebaseapp.com",
+      projectId: "pawllos-c985f",
+      storageBucket: "pawllos-c985f.firebasestorage.app",
+      messagingSenderId: "605956154730",
+      appId: "1:605956154730:web:d0df6d427f92b581467113"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const auth = firebase.auth();
+  </script>
   <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      margin: 0;
-      background: #fffaf4;
-    }
-
-    header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background-color: #ff6f61;
-      color: white;
-      padding: 1rem 2rem;
-    }
-
-    .nav-tabs a {
-      margin: 0 1rem;
-      text-decoration: none;
-      color: white;
-      font-weight: bold;
-      padding: 0.3rem 0.8rem;
-      border-radius: 6px;
-    }
-
-    .nav-tabs a.active {
-      background-color: #fff;
-      color: #ff6f61;
-    }
-
-    .avatar {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      cursor: pointer;
-    }
-
-    .container {
-      padding: 2rem;
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 2rem;
-    }
-
     .pet-card {
-      background-color: white;
-      border-radius: 12px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-      overflow: hidden;
-      text-align: center;
+      border: 1px solid #ccc;
+      padding: 16px;
+      margin: 12px;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     }
-
     .pet-card img {
       width: 100%;
-      height: 200px;
+      max-height: 200px;
       object-fit: cover;
-    }
-
-    .pet-card h3 {
-      margin: 0.5rem;
-    }
-
-    .pet-card button {
-      background-color: #ff6f61;
-      color: white;
-      border: none;
-      padding: 0.5rem 1rem;
-      margin-bottom: 1rem;
       border-radius: 6px;
-      cursor: pointer;
-    }
-
-    .pet-card button:hover {
-      background-color: #e55347;
     }
   </style>
 </head>
 <body>
-
-  <header>
-    <div class="logo"><h2>🐾 PAWLLOS</h2></div>
-    <nav class="nav-tabs">
-      <a href="index.html" class="active">HOME</a>
-      <a href="add_pet.html">ADD PET</a>
-      <a href="about.html">ABOUT</a>
-    </nav>
-    <img src="avatar.png" alt="User" class="avatar" onclick="goToProfile()" />
-  </header>
-
-  <div class="container" id="petList">
-    <!-- Pets will load here -->
-  </div>
+  <h2>Welcome to Pawllos</h2>
+  <div id="petGrid"></div>
 
   <script>
-    function goToProfile() {
-      window.location.href = "profile.html";
-    }
-
-    const pets = [
-      { name: "Bruno", type: "Dog", image: "images/white-dog.jpg" },
-      { name: "Mittens", type: "Cat", image: "images/isolated-shot-ginger-kitten-sitting-front-white-looking-right.jpg" },
-      { name: "Rocky", type: "Dog", image: "images/vertical-shot-lovely-french-bulldog-puppy-sitting-white.jpg" },
-      { name: "Luna", type: "Rabbit", image: "rabbit1.jpg" }
-    ];
-
-    const petList = document.getElementById("petList");
-
-    pets.forEach(pet => {
-      const card = document.createElement("div");
-      card.className = "pet-card";
-      card.innerHTML = `
-        <img src="${pet.image}" alt="${pet.name}" />
-        <h3>${pet.name}</h3>
-        <p>${pet.type}</p>
-        <button onclick="adopt('${pet.name}', '${pet.type}')">Adopt</button>
-      `;
-      petList.appendChild(card);
+    auth.onAuthStateChanged(user => {
+      if (user) {
+        db.collection("users").doc(user.uid).get().then(userDoc => {
+          const userStyle = userDoc.data().surveyStyle;
+          db.collection("pets").where("style", "==", userStyle).get()
+            .then(snapshot => {
+              const grid = document.getElementById("petGrid");
+              grid.innerHTML = '';
+              snapshot.forEach(doc => {
+                const pet = doc.data();
+                const div = document.createElement("div");
+                div.className = "pet-card";
+                div.innerHTML = `
+                  <img src="${pet.image}" alt="${pet.name}">
+                  <h3>${pet.name}</h3>
+                  <p>Breed: ${pet.breed}</p>
+                  <p>Age: ${pet.age}</p>
+                  <p>Location: ${pet.location}</p>
+                  <button onclick="adoptPet('${doc.id}')">Adopt</button>
+                `;
+                grid.appendChild(div);
+              });
+            });
+        });
+      }
     });
 
-    function adopt(name, type) {
-      localStorage.setItem("selectedPet", JSON.stringify({ name, type }));
+    function adoptPet(petId) {
+      localStorage.setItem("selected_pet_id", petId);
       window.location.href = "adopt.html";
     }
   </script>
-
 </body>
 </html>
