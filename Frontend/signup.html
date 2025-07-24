@@ -1,61 +1,165 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Sign Up | Pawllos</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Signup | Pawllos</title>
+
+  <!-- ✅ Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js"></script>
-  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyBX10ONUiCc9NPrOmjFsC3Dq83u8GxwaK0",
-      authDomain: "pawllos-c985f.firebaseapp.com",
-      projectId: "pawllos-c985f",
-      storageBucket: "pawllos-c985f.firebasestorage.app",
-      messagingSenderId: "605956154730",
-      appId: "1:605956154730:web:d0df6d427f92b581467113"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
-    const auth = firebase.auth();
-  </script>
+
+  <!-- ✅ Embedded CSS -->
+  <style>
+    body {
+      background-color: #fff3f2;
+      font-family: 'Segoe UI', sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .signup-container {
+      background-color: white;
+      padding: 2rem;
+      border-radius: 15px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 400px;
+    }
+
+    h2 {
+      text-align: center;
+      color: #ff6f61;
+      margin-bottom: 1.5rem;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      color: #444;
+      font-weight: 500;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    input[type="url"] {
+      width: 100%;
+      padding: 0.75rem;
+      margin-bottom: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 1rem;
+    }
+
+    button {
+      width: 100%;
+      padding: 0.75rem;
+      background-color: #ff6f61;
+      color: white;
+      border: none;
+      font-size: 1rem;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #e55347;
+    }
+
+    .login-link {
+      text-align: center;
+      margin-top: 1rem;
+      font-size: 0.9rem;
+    }
+
+    .login-link a {
+      color: #ff6f61;
+      text-decoration: none;
+    }
+
+    .login-link a:hover {
+      text-decoration: underline;
+    }
+  </style>
 </head>
 <body>
-  <h2>Signup</h2>
-  <form id="signupForm">
-    <input type="text" id="name" placeholder="Name" required><br>
-    <input type="email" id="email" placeholder="Email" required><br>
-    <input type="text" id="phone" placeholder="Phone" required><br>
-    <input type="password" id="password" placeholder="Password" required><br>
-    <input type="url" id="profilePic" placeholder="Profile Picture URL"><br>
-    <button type="submit">Sign Up</button>
-  </form>
-  <script>
-    document.getElementById("signupForm").addEventListener("submit", function(e) {
-      e.preventDefault();
-      const name = document.getElementById("name").value;
-      const email = document.getElementById("email").value;
-      const phone = document.getElementById("phone").value;
-      const password = document.getElementById("password").value;
-      const profilePic = document.getElementById("profilePic").value;
 
-      auth.createUserWithEmailAndPassword(email, password)
-        .then((cred) => {
-          return db.collection("users").doc(cred.user.uid).set({
-            name,
-            email,
-            phone,
-            profilePic,
-            createdAt: firebase.firestore.FieldValue.serverTimestamp()
-          });
-        })
-        .then(() => {
-          window.location.href = "survey.html";
-        })
-        .catch(err => alert(err.message));
+  <div class="signup-container">
+    <h2>Create an Account</h2>
+    <form id="signupForm">
+      <label for="name">Full Name</label>
+      <input type="text" id="name" required>
+
+      <label for="email">Email</label>
+      <input type="email" id="email" required>
+
+      <label for="phone">Phone Number</label>
+      <input type="text" id="phone" required>
+
+      <label for="password">Password</label>
+      <input type="password" id="password" required>
+
+      <label for="profilePic">Profile Picture URL (optional)</label>
+      <input type="url" id="profilePic" placeholder="https://example.com/photo.jpg">
+
+      <button type="submit">Sign Up</button>
+    </form>
+    <div class="login-link">
+      Already have an account? <a href="login.html">Log in</a>
+    </div>
+  </div>
+
+  <!-- ✅ Firebase Init + Signup Logic -->
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const firebaseConfig = {
+        apiKey: "AIzaSyBX10ONUiCc9NPrOmjFsC3Dq83u8GxwaK0",
+        authDomain: "pawllos-c985f.firebaseapp.com",
+        projectId: "pawllos-c985f",
+        storageBucket: "pawllos-c985f.firebaseapp.com",
+        messagingSenderId: "605956154730",
+        appId: "1:605956154730:web:d0df6d427f92b581467113"
+      };
+
+      firebase.initializeApp(firebaseConfig);
+      const db = firebase.firestore();
+      const auth = firebase.auth();
+
+      const form = document.getElementById("signupForm");
+      form.addEventListener("submit", function (e) {
+        e.preventDefault();
+        const name = document.getElementById("name").value;
+        const email = document.getElementById("email").value;
+        const phone = document.getElementById("phone").value;
+        const password = document.getElementById("password").value;
+        const profilePic = document.getElementById("profilePic").value;
+
+        auth.createUserWithEmailAndPassword(email, password)
+          .then((cred) => {
+            return db.collection("users").doc(cred.user.uid).set({
+              name,
+              email,
+              phone,
+              profilePic,
+              createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+          })
+          .then(() => {
+            alert("Signup successful! Redirecting to survey...");
+            window.location.href = "survey.html";
+          })
+          .catch(err => alert("❌ " + err.message));
+      });
     });
   </script>
-  <script src="shared.js"></script>
 
+  <!-- Optional: Shared navbar/logout logic -->
+  <script src="shared.js"></script>
 </body>
 </html>
