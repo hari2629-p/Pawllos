@@ -1,67 +1,163 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Add Pet | Pawllos</title>
+
+  <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js"></script>
-  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyBX10ONUiCc9NPrOmjFsC3Dq83u8GxwaK0",
-      authDomain: "pawllos-c985f.firebaseapp.com",
-      projectId: "pawllos-c985f",
-      storageBucket: "pawllos-c985f.firebasestorage.app",
-      messagingSenderId: "605956154730",
-      appId: "1:605956154730:web:d0df6d427f92b581467113"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
-    const auth = firebase.auth();
-  </script>
+
+  <style>
+    body {
+      background-color: #fffaf4;
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 2rem;
+      display: flex;
+      justify-content: center;
+    }
+
+    .form-container {
+      background-color: white;
+      padding: 2rem;
+      border-radius: 15px;
+      max-width: 600px;
+      width: 100%;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+      text-align: center;
+      color: #ff6f61;
+    }
+
+    label {
+      display: block;
+      margin-top: 1rem;
+      font-weight: 500;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 0.7rem;
+      margin-top: 0.3rem;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 1rem;
+    }
+
+    textarea {
+      resize: vertical;
+    }
+
+    button {
+      margin-top: 1.5rem;
+      width: 100%;
+      padding: 0.8rem;
+      background-color: #ff6f61;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #e55347;
+    }
+  </style>
 </head>
 <body>
-  <h2>Add a Pet</h2>
-  <form id="petForm">
-    <input type="text" id="name" placeholder="Pet Name" required><br>
-    <input type="text" id="breed" placeholder="Breed" required><br>
-    <input type="text" id="age" placeholder="Age" required><br>
-    <input type="text" id="type" placeholder="Type (dog/cat/etc.)" required><br>
-    <input type="text" id="location" placeholder="Location" required><br>
-    <input type="text" id="style" placeholder="Pet Style (care_oriented/guard_oriented/emotional_core)" required><br>
-    <input type="url" id="image" placeholder="Image URL" required><br>
-    <button type="submit">Add Pet</button>
-  </form>
 
+  <div class="form-container">
+    <h2>Post a Pet for Adoption</h2>
+    <form id="petForm">
+      <label for="name">Pet Name</label>
+      <input type="text" id="name" required>
+
+      <label for="age">Age</label>
+      <input type="text" id="age" required>
+
+      <label for="type">Type</label>
+      <select id="type" required>
+        <option value="">--Select--</option>
+        <option value="dog">Dog</option>
+        <option value="cat">Cat</option>
+      </select>
+
+      <label for="location">Location</label>
+      <input type="text" id="location" required>
+
+      <label for="image">Image URL</label>
+      <input type="url" id="image" placeholder="https://example.com/pet.jpg" required>
+
+      <label for="behavior">Behavior Style</label>
+      <select id="behavior" required>
+        <option value="">--Select--</option>
+        <option value="care_oriented">Care-Oriented</option>
+        <option value="guard_oriented">Guard-Oriented</option>
+        <option value="emotional_core">Emotional Core</option>
+      </select>
+
+      <label for="notes">Description (optional)</label>
+      <textarea id="notes" rows="3" placeholder="Describe the pet..."></textarea>
+
+      <button type="submit">Add Pet</button>
+    </form>
+  </div>
+
+  <!-- Firebase Logic -->
   <script>
-    document.getElementById("petForm").addEventListener("submit", function(e) {
-      e.preventDefault();
+    document.addEventListener("DOMContentLoaded", () => {
+      const firebaseConfig = {
+        apiKey: "AIzaSyBX10ONUiCc9NPrOmjFsC3Dq83u8GxwaK0",
+        authDomain: "pawllos-c985f.firebaseapp.com",
+        projectId: "pawllos-c985f",
+        storageBucket: "pawllos-c985f.firebaseapp.com",
+        messagingSenderId: "605956154730",
+        appId: "1:605956154730:web:d0df6d427f92b581467113"
+      };
+      firebase.initializeApp(firebaseConfig);
+      const db = firebase.firestore();
+      const auth = firebase.auth();
 
       auth.onAuthStateChanged(user => {
-        if (user) {
-          const pet = {
+        if (!user) {
+          alert("Please log in to add a pet.");
+          window.location.href = "login.html";
+          return;
+        }
+
+        document.getElementById("petForm").addEventListener("submit", function (e) {
+          e.preventDefault();
+
+          const newPet = {
             name: document.getElementById("name").value,
-            breed: document.getElementById("breed").value,
             age: document.getElementById("age").value,
             type: document.getElementById("type").value,
             location: document.getElementById("location").value,
-            style: document.getElementById("style").value,
             image: document.getElementById("image").value,
-            addedBy: user.uid,
+            behaviorStyle: document.getElementById("behavior").value,
+            description: document.getElementById("notes").value,
+            postedBy: user.uid,
             createdAt: firebase.firestore.FieldValue.serverTimestamp()
           };
 
-          db.collection("pets").add(pet).then(() => {
-            alert("Pet added successfully!");
+          db.collection("pets").add(newPet).then(() => {
+            alert("✅ Pet posted successfully!");
             window.location.href = "index.html";
-          }).catch(err => alert("Failed to add pet: " + err.message));
-        } else {
-          alert("You must be logged in to add a pet.");
-        }
+          }).catch(err => {
+            alert("❌ Error: " + err.message);
+          });
+        });
       });
     });
   </script>
-  <script src="shared.js"></script>
 
+  <!-- Shared UI logic -->
+  <script src="shared.js"></script>
 </body>
 </html>
