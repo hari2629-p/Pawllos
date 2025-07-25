@@ -1,85 +1,160 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>My Profile | Pawllos</title>
+
+  <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js"></script>
-  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyBX10ONUiCc9NPrOmjFsC3Dq83u8GxwaK0",
-      authDomain: "pawllos-c985f.firebaseapp.com",
-      projectId: "pawllos-c985f",
-      storageBucket: "pawllos-c985f.firebasestorage.app",
-      messagingSenderId: "605956154730",
-      appId: "1:605956154730:web:d0df6d427f92b581467113"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
-    const auth = firebase.auth();
-  </script>
+
   <style>
-    body { font-family: Arial; padding: 20px; }
-    .card { background: #fff3f2; padding: 20px; margin-bottom: 20px; border-radius: 10px; box-shadow: 0 1px 5px rgba(0,0,0,0.1); }
-    h2 { margin-top: 0; }
-    .list { margin-left: 20px; }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #fffaf4;
+      margin: 0;
+      padding: 2rem;
+    }
+
+    .profile-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      background: white;
+      padding: 1rem 2rem;
+      border-radius: 12px;
+      box-shadow: 0 0 8px rgba(0,0,0,0.05);
+      margin-bottom: 2rem;
+    }
+
+    .profile-header img {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid #ff6f61;
+    }
+
+    .profile-header .info h2 {
+      margin: 0;
+      color: #ff6f61;
+    }
+
+    .section {
+      margin-top: 2rem;
+    }
+
+    .section h3 {
+      color: #333;
+      margin-bottom: 0.5rem;
+    }
+
+    .card {
+      background-color: white;
+      border: 1px solid #eee;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      border-radius: 10px;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.05);
+    }
+
+    .card p {
+      margin: 0.25rem 0;
+      font-size: 0.95rem;
+    }
+
+    .card strong {
+      color: #ff6f61;
+    }
   </style>
 </head>
 <body>
-  <h2>My Profile</h2>
-  <div id="userDetails" class="card"></div>
-  <div id="postedPets" class="card"></div>
-  <div id="adoptionHistory" class="card"></div>
 
+  <div id="profileContainer"></div>
+
+  <div class="section">
+    <h3>🐶 Pets You Posted</h3>
+    <div id="postedPets"></div>
+  </div>
+
+  <div class="section">
+    <h3>📩 Your Adoption Requests</h3>
+    <div id="adoptionHistory"></div>
+  </div>
+
+  <!-- Firebase Logic -->
   <script>
-    auth.onAuthStateChanged(user => {
-      if (user) {
-        const uid = user.uid;
+    document.addEventListener("DOMContentLoaded", async () => {
+      const firebaseConfig = {
+        apiKey: "AIzaSyBX10ONUiCc9NPrOmjFsC3Dq83u8GxwaK0",
+        authDomain: "pawllos-c985f.firebaseapp.com",
+        projectId: "pawllos-c985f",
+        storageBucket: "pawllos-c985f.firebaseapp.com",
+        messagingSenderId: "605956154730",
+        appId: "1:605956154730:web:d0df6d427f92b581467113"
+      };
+      firebase.initializeApp(firebaseConfig);
+      const db = firebase.firestore();
+      const auth = firebase.auth();
 
-        db.collection("users").doc(uid).get().then(doc => {
-          const data = doc.data();
-          document.getElementById("userDetails").innerHTML = `
-            <h3>Account Info</h3>
-            <p><strong>Name:</strong> ${data.name}</p>
-            <p><strong>Email:</strong> ${data.email}</p>
-            <p><strong>Phone:</strong> ${data.phone}</p>
-            <p><strong>Style:</strong> ${data.surveyStyle || 'Not Taken'}</p>
-            <img src="${data.profilePic}" alt="Profile Pic" style="max-width: 150px; border-radius: 8px;">
-          `;
-        });
-
-        db.collection("pets").where("addedBy", "==", uid).get().then(snapshot => {
-          let html = '<h3>Pets You Posted</h3><ul class="list">';
-          snapshot.forEach(doc => {
-            const p = doc.data();
-            html += `<li>${p.name} - ${p.type} (${p.breed})</li>`;
-          });
-          html += '</ul>';
-          document.getElementById("postedPets").innerHTML = html;
-        });
-
-        db.collection("adoptions").where("userId", "==", uid).get().then(snapshot => {
-          let html = '<h3>Your Adoptions</h3><ul class="list">';
-          const fetches = [];
-          snapshot.forEach(doc => {
-            const petId = doc.data().petId;
-            fetches.push(
-              db.collection("pets").doc(petId).get().then(petDoc => {
-                const pet = petDoc.data();
-                html += `<li>${pet.name} - ${pet.type} (${pet.breed})</li>`;
-              })
-            );
-          });
-          Promise.all(fetches).then(() => {
-            html += '</ul>';
-            document.getElementById("adoptionHistory").innerHTML = html;
-          });
-        });
+      const user = await new Promise(resolve => auth.onAuthStateChanged(resolve));
+      if (!user) {
+        alert("Please log in to view your profile.");
+        window.location.href = "login.html";
+        return;
       }
+
+      const uid = user.uid;
+
+      // Get user profile
+      const userDoc = await db.collection("users").doc(uid).get();
+      const userData = userDoc.data();
+      const profileHtml = `
+        <div class="profile-header">
+          <img src="${userData.profilePic || 'https://placehold.co/100x100'}" alt="Profile Pic" />
+          <div class="info">
+            <h2>${userData.name}</h2>
+            <p>${userData.email}</p>
+            <p>${userData.phone}</p>
+          </div>
+        </div>
+      `;
+      document.getElementById("profileContainer").innerHTML = profileHtml;
+
+      // Pets Posted by User
+      const petsSnap = await db.collection("pets").where("postedBy", "==", uid).get();
+      let petsHTML = "";
+      petsSnap.forEach(doc => {
+        const pet = doc.data();
+        petsHTML += `
+          <div class="card">
+            <p><strong>${pet.name}</strong> (${pet.type}, ${pet.age})</p>
+            <p>Location: ${pet.location}</p>
+            <p>Behavior Style: ${pet.behaviorStyle}</p>
+          </div>
+        `;
+      });
+      document.getElementById("postedPets").innerHTML = petsHTML || "<p>No pets posted yet.</p>";
+
+      // Adoption History
+      const adoptionsSnap = await db.collection("adoptions").where("userId", "==", uid).get();
+      let adoptionsHTML = "";
+      adoptionsSnap.forEach(doc => {
+        const req = doc.data();
+        adoptionsHTML += `
+          <div class="card">
+            <p><strong>${req.petName}</strong> - ${req.status}</p>
+            <p>Reason: ${req.message}</p>
+          </div>
+        `;
+      });
+      document.getElementById("adoptionHistory").innerHTML = adoptionsHTML || "<p>No adoption activity yet.</p>";
     });
   </script>
-  <script src="shared.js"></script>
 
+  <!-- Shared -->
+  <script src="shared.js"></script>
 </body>
 </html>
