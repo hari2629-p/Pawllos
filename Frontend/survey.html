@@ -1,59 +1,158 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>User Survey | Pawllos</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Survey | Pawllos</title>
+
+  <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js"></script>
-  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyBX10ONUiCc9NPrOmjFsC3Dq83u8GxwaK0",
-      authDomain: "pawllos-c985f.firebaseapp.com",
-      projectId: "pawllos-c985f",
-      storageBucket: "pawllos-c985f.firebasestorage.app",
-      messagingSenderId: "605956154730",
-      appId: "1:605956154730:web:d0df6d427f92b581467113"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
-    const auth = firebase.auth();
-  </script>
+
+  <!-- Styles -->
+  <style>
+    body {
+      background-color: #fff3f2;
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 2rem;
+      display: flex;
+      justify-content: center;
+    }
+
+    .survey-container {
+      background-color: white;
+      padding: 2rem 2.5rem;
+      border-radius: 15px;
+      max-width: 600px;
+      width: 100%;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    h2 {
+      text-align: center;
+      color: #ff6f61;
+      margin-bottom: 1.5rem;
+    }
+
+    label {
+      font-weight: 500;
+      display: block;
+      margin: 1rem 0 0.5rem;
+      color: #444;
+    }
+
+    select,
+    textarea {
+      width: 100%;
+      padding: 0.75rem;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 1rem;
+      resize: vertical;
+    }
+
+    button {
+      margin-top: 1.5rem;
+      width: 100%;
+      padding: 0.75rem;
+      background-color: #ff6f61;
+      color: white;
+      font-size: 1rem;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #ff3b2e;
+    }
+  </style>
 </head>
 <body>
-  <h2>Tell Us About Your Pet Preferences</h2>
-  <form id="surveyForm">
-    <label>Your Pet Handling Style:</label>
-    <select id="style" required>
-      <option value="">--Select--</option>
-      <option value="care_oriented">Care-Oriented</option>
-      <option value="guard_oriented">Guard-Oriented</option>
-      <option value="emotional_core">Emotional Core</option>
-    </select>
-    <br><br>
-    <button type="submit">Submit</button>
-  </form>
 
+  <div class="survey-container">
+    <h2>Tell Us About Your Pet Preferences</h2>
+    <form id="surveyForm">
+      <label for="handling_style">Your Pet Handling Style</label>
+      <select id="handling_style" required>
+        <option value="">--Select--</option>
+        <option value="care_oriented">Care-Oriented (compassionate and nurturing)</option>
+        <option value="guard_oriented">Guard-Oriented (prefers alert, protective pets)</option>
+        <option value="emotional_core">Emotional Core (deep bond, empathy driven)</option>
+      </select>
+
+      <label for="pet_size">Preferred Pet Size</label>
+      <select id="pet_size" required>
+        <option value="">--Select--</option>
+        <option value="small">Small</option>
+        <option value="medium">Medium</option>
+        <option value="large">Large</option>
+      </select>
+
+      <label for="activity_level">Preferred Activity Level</label>
+      <select id="activity_level" required>
+        <option value="">--Select--</option>
+        <option value="low">Low (indoor, calm)</option>
+        <option value="moderate">Moderate (regular walks/play)</option>
+        <option value="high">High (energetic, needs space)</option>
+      </select>
+
+      <label for="notes">Additional Notes (optional)</label>
+      <textarea id="notes" rows="3" placeholder="Tell us more about your ideal pet..."></textarea>
+
+      <button type="submit">Submit Survey</button>
+    </form>
+  </div>
+
+  <!-- Firebase logic -->
   <script>
-    document.getElementById("surveyForm").addEventListener("submit", function(e) {
-      e.preventDefault();
-      const style = document.getElementById("style").value;
+    document.addEventListener("DOMContentLoaded", function () {
+      const firebaseConfig = {
+        apiKey: "AIzaSyBX10ONUiCc9NPrOmjFsC3Dq83u8GxwaK0",
+        authDomain: "pawllos-c985f.firebaseapp.com",
+        projectId: "pawllos-c985f",
+        storageBucket: "pawllos-c985f.firebaseapp.com",
+        messagingSenderId: "605956154730",
+        appId: "1:605956154730:web:d0df6d427f92b581467113"
+      };
+      firebase.initializeApp(firebaseConfig);
+      const db = firebase.firestore();
+      const auth = firebase.auth();
 
-      auth.onAuthStateChanged(user => {
+      const form = document.getElementById("surveyForm");
+
+      form.addEventListener("submit", function (e) {
+        e.preventDefault();
+
+        const handling_style = document.getElementById("handling_style").value;
+        const pet_size = document.getElementById("pet_size").value;
+        const activity_level = document.getElementById("activity_level").value;
+        const notes = document.getElementById("notes").value;
+
+        const user = auth.currentUser;
         if (user) {
           db.collection("users").doc(user.uid).update({
-            surveyStyle: style
+            preferences: {
+              handling_style,
+              pet_size,
+              activity_level,
+              notes
+            }
           }).then(() => {
-            alert("Survey submitted successfully!");
+            alert("✅ Survey saved! Redirecting to homepage...");
             window.location.href = "index.html";
-          });
+          }).catch(err => alert("Error: " + err.message));
         } else {
-          alert("You must be logged in to submit the survey.");
+          alert("Please log in first.");
+          window.location.href = "login.html";
         }
       });
     });
   </script>
-  <script src="shared.js"></script>
 
+  <!-- Shared nav/logic -->
+  <script src="shared.js"></script>
 </body>
 </html>
