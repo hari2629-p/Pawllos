@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Login | Pawllos</title>
 
@@ -9,20 +9,8 @@
   <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js"></script>
-  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyBX10ONUiCc9NPrOmjFsC3Dq83u8GxwaK0",
-      authDomain: "pawllos-c985f.firebaseapp.com",
-      projectId: "pawllos-c985f",
-      storageBucket: "pawllos-c985f.firebasestorage.app",
-      messagingSenderId: "605956154730",
-      appId: "1:605956154730:web:d0df6d427f92b581467113"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
-    const auth = firebase.auth();
-  </script>
 
+  <!-- CSS Styling -->
   <style>
     body {
       background-color: #fff3f2;
@@ -37,9 +25,10 @@
     .login-box {
       background-color: white;
       padding: 2rem;
-      border-radius: 10px;
+      border-radius: 15px;
       box-shadow: 0 0 10px rgba(0,0,0,0.1);
-      width: 350px;
+      width: 100%;
+      max-width: 400px;
       text-align: center;
     }
 
@@ -50,10 +39,10 @@
 
     input {
       width: 100%;
-      padding: 0.7rem;
+      padding: 0.75rem;
       margin: 0.5rem 0;
       border: 1px solid #ccc;
-      border-radius: 5px;
+      border-radius: 8px;
       font-size: 1rem;
     }
 
@@ -62,11 +51,12 @@
       background-color: #ff6f61;
       color: white;
       border: none;
-      padding: 0.75rem;
-      border-radius: 5px;
+      padding: 0.8rem;
+      border-radius: 8px;
       font-size: 1rem;
       cursor: pointer;
       margin-top: 1rem;
+      transition: background-color 0.3s ease;
     }
 
     button:hover {
@@ -97,26 +87,41 @@
       <button type="submit">Login</button>
     </form>
     <div class="signup-link">
-      Don't have an account? <a href="signup.html">Sign up</a>
+      Don’t have an account? <a href="signup.html">Sign up</a>
     </div>
   </div>
 
+  <!-- Firebase Logic -->
   <script>
-    document.getElementById("loginForm").addEventListener("submit", function(e) {
-      e.preventDefault();
-      const email = document.getElementById("email").value;
-      const password = document.getElementById("password").value;
+    document.addEventListener("DOMContentLoaded", function () {
+      const firebaseConfig = {
+        apiKey: "AIzaSyBX10ONUiCc9NPrOmjFsC3Dq83u8GxwaK0",
+        authDomain: "pawllos-c985f.firebaseapp.com",
+        projectId: "pawllos-c985f",
+        storageBucket: "pawllos-c985f.firebaseapp.com",
+        messagingSenderId: "605956154730",
+        appId: "1:605956154730:web:d0df6d427f92b581467113"
+      };
 
-      auth.signInWithEmailAndPassword(email, password)
-        .then(() => {
-          alert("Login successful");
-          window.location.href = "index.html";
-        })
-        .catch(err => alert("Login failed: " + err.message));
+      firebase.initializeApp(firebaseConfig);
+      const auth = firebase.auth();
+
+      document.getElementById("loginForm").addEventListener("submit", function(e) {
+        e.preventDefault();
+        const email = document.getElementById("email").value;
+        const password = document.getElementById("password").value;
+
+        auth.signInWithEmailAndPassword(email, password)
+          .then(() => {
+            alert("✅ Login successful!");
+            window.location.href = "index.html";
+          })
+          .catch(err => alert("❌ Login failed: " + err.message));
+      });
     });
   </script>
 
-  <!-- Optional: Include shared navbar and logout logic -->
+  <!-- Optional shared logic -->
   <script src="shared.js"></script>
 </body>
 </html>
