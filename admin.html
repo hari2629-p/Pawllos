@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Panel | Pawllos</title>
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js"></script>
+
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #fffaf4;
+      margin: 0;
+      padding: 2rem;
+    }
+
+    h2 {
+      text-align: center;
+      color: #ff6f61;
+      margin-bottom: 2rem;
+    }
+
+    .request {
+      background-color: white;
+      border: 1px solid #eee;
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+      border-radius: 10px;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.05);
+    }
+
+    .request p {
+      margin: 0.4rem 0;
+    }
+
+    .status {
+      font-weight: bold;
+      color: #555;
+    }
+
+    .buttons {
+      margin-top: 1rem;
+    }
+
+    .buttons button {
+      padding: 0.5rem 1rem;
+      margin-right: 1rem;
+      border: none;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.3s ease;
+    }
+
+    .approve {
+      background-color: #4caf50;
+      color: white;
+    }
+
+    .reject {
+      background-color: #f44336;
+      color: white;
+    }
+
+    .approve:hover {
+      background-color: #388e3c;
+    }
+
+    .reject:hover {
+      background-color: #d32f2f;
+    }
+
+    footer {
+      text-align: center;
+      color: #777;
+      font-size: 0.9rem;
+      margin-top: 3rem;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>🐾 Admin - Adoption Requests</h2>
+  <div id="requestsContainer"></div>
+
+  <footer>
+    &copy; 2025 Pawllos | Admin Portal
+  </footer>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", async () => {
+      const firebaseConfig = {
+        apiKey: "AIzaSyBX10ONUiCc9NPrOmjFsC3Dq83u8GxwaK0",
+        authDomain: "pawllos-c985f.firebaseapp.com",
+        projectId: "pawllos-c985f",
+        storageBucket: "pawllos-c985f.firebaseapp.com",
+        messagingSenderId: "605956154730",
+        appId: "1:605956154730:web:d0df6d427f92b581467113"
+      };
+      firebase.initializeApp(firebaseConfig);
+      const db = firebase.firestore();
+      const auth = firebase.auth();
+
+      const container = document.getElementById("requestsContainer");
+
+      const adminEmail = "www.hariatl10@gmail.com"; // change this to your admin account
+
+      const user = await new Promise(resolve => auth.onAuthStateChanged(resolve));
+      if (!user || user.email !== adminEmail) {
+        alert("Access denied. You are not authorized.");
+        window.location.href = "index.html";
+        return;
+      }
+
+      const snap = await db.collection("adoptions").orderBy("createdAt", "desc").get();
+
+      if (snap.empty) {
+        container.innerHTML = "<p>No adoption requests yet.</p>";
+        return;
+      }
+
+      snap.forEach(doc => {
+        const data = doc.data();
+        const div = document.createElement("div");
+        div.className = "request";
+        div.innerHTML = `
+          <p><strong>Pet:</strong> ${data.petName}</p>
+          <p><strong>User:</strong> ${data.userName}</p>
+          <p><strong>Email:</strong> ${data.email}</p>
+          <p><strong>Phone:</strong> ${data.phone}</p>
+          <p><strong>Reason:</strong> ${data.message}</p>
+          <p class="status">Status: <span id="status-${doc.id}">${data.status}</span></p>
+          <div class="buttons">
+            <button class="approve" onclick="updateStatus('${doc.id}', 'Approved')">Approve</button>
+            <button class="reject" onclick="updateStatus('${doc.id}', 'Rejected')">Reject</button>
+          </div>
+        `;
+        container.appendChild(div);
+      });
+    });
+
+    async function updateStatus(id, newStatus) {
+      const db = firebase.firestore();
+      await db.collection("adoptions").doc(id).update({ status: newStatus });
+      document.getElementById("status-" + id).textContent = newStatus;
+      alert("Status updated to " + newStatus);
+    }
+  </script>
+
+  <!-- Shared navigation -->
+  <script src="shared.js"></script>
+</body>
+</html>
