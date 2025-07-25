@@ -1,67 +1,41 @@
 # 🐾 PAWLLOS - Pet Adoption Web App
 
-PAWLLOS is a pet adoption web platform where users can:
+Pawllos is a simple and user-friendly pet adoption website where users can:
 
-* Sign up and take a pet preference survey
-* View pets that match their personality and preferences
-* Adopt pets with a simple application
+* Sign up and take a short pet style survey
+* View pets based on their preferences
+* Apply to adopt a pet
 * Post pets for adoption
-* Track their adoption and post history via their profile
+* Manage their own profile and view activity
 
+## 📁 Project Structure
 
-
-## 🚀 How to Run
-
-1. Clone or download the project folder.
-2. Open `signup.html` in your browser.
-3. Follow the flow:
-
-   * Sign up → Survey → Homepage → Adopt or Add Pets → View Profile
-
-## 🔐 Firebase Setup
-
-This app uses [Firebase](https://firebase.google.com) for:
-
-* 🔐 Authentication (email + password)
-* 🔥 Firestore Database (users, pets, adoptions)
-
-You must include this in **every page**:
-
-```html
-<script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore.js"></script>
+```
+/your-project-folder
+├── index.html         # Homepage (shows matching pets)
+├── signup.html        # User registration page
+├── login.html         # User login page
+├── survey.html        # Survey to match users with pets
+├── add_pet.html       # Page to post a new pet
+├── adopt.html         # Page to apply for adoption
+├── profile.html       # User profile and history
+├── about.html         # Info about the platform
+├── shared.js          # Common nav + logout + Firebase setup
+└── README.md          # This file
 ```
 
-And configure it:
+## 🚀 How to Use
 
-```js
-const firebaseConfig = { /* your config */ };
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
-const auth = firebase.auth();
-```
+1. Open `signup.html` in a browser
+2. Create an account → Take the survey → View matching pets
+3. Adopt a pet or add your own for adoption
+4. Visit your profile anytime
 
-## 🧠 Key Features
+## 🔥 Firebase Features
 
-* Firebase Auth for secure login/signup
-* Firestore for real-time pet/user/adoption data
-* Matching logic: shows pets based on user survey result
-* Reusable `shared.js` handles:
+* Auth: Secure signup/login
+* Firestore: Stores users, pets, and adoption data
 
-  * Firebase setup
-  * Navbar with active page highlight
-  * Logout functionality
+## 💙 Built By
 
-## 🌐 Firebase Hosting (optional)
-
-```bash
-npm install -g firebase-tools
-firebase login
-firebase init  # choose "Hosting", set public dir
-firebase deploy
-```
-
-## 📝 Credits
-
-Built with 💙 by Harigovind P. Nair
+Harigovind P. Nair
