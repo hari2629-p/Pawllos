@@ -8,21 +8,10 @@ Pawllos is a simple and user-friendly pet adoption website where users can:
 * Post pets for adoption
 * Manage their own profile and view activity
 
-## 📁 Project Structure
+
 
 ```
-/your-project-folder
-├── index.html         # Homepage (shows matching pets)
-├── signup.html        # User registration page
-├── login.html         # User login page
-├── survey.html        # Survey to match users with pets
-├── add_pet.html       # Page to post a new pet
-├── adopt.html         # Page to apply for adoption
-├── profile.html       # User profile and history
-├── about.html         # Info about the platform
-├── shared.js          # Common nav + logout + Firebase setup
-└── README.md          # This file
-```
+
 
 ## 🚀 How to Use
 
