@@ -10,88 +10,34 @@
   <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js"></script>
 
-  <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background-color: #fffaf4;
-      margin: 0;
-      padding: 2rem;
-    }
-
-    .profile-header {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      background: white;
-      padding: 1rem 2rem;
-      border-radius: 12px;
-      box-shadow: 0 0 8px rgba(0,0,0,0.05);
-      margin-bottom: 2rem;
-    }
-
-    .profile-header img {
-      width: 80px;
-      height: 80px;
-      border-radius: 50%;
-      object-fit: cover;
-      border: 2px solid #ff6f61;
-    }
-
-    .profile-header .info h2 {
-      margin: 0;
-      color: #ff6f61;
-    }
-
-    .section {
-      margin-top: 2rem;
-    }
-
-    .section h3 {
-      color: #333;
-      margin-bottom: 0.5rem;
-    }
-
-    .card {
-      background-color: white;
-      border: 1px solid #eee;
-      padding: 1rem;
-      margin-bottom: 1rem;
-      border-radius: 10px;
-      box-shadow: 0 1px 6px rgba(0,0,0,0.05);
-    }
-
-    .card p {
-      margin: 0.25rem 0;
-      font-size: 0.95rem;
-    }
-
-    .card strong {
-      color: #ff6f61;
-    }
-  </style>
+  <!-- Shared Styles -->
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
 
+  <!-- Profile Card -->
   <div id="profileContainer"></div>
 
+  <!-- Posted Pets -->
   <div class="section">
     <h3>🐶 Pets You Posted</h3>
     <div id="postedPets"></div>
   </div>
 
+  <!-- Adoption History -->
   <div class="section">
     <h3>📩 Your Adoption Requests</h3>
     <div id="adoptionHistory"></div>
   </div>
 
-  <!-- Firebase Logic -->
+  <!-- Firebase Script -->
   <script>
     document.addEventListener("DOMContentLoaded", async () => {
       const firebaseConfig = {
         apiKey: "AIzaSyBX10ONUiCc9NPrOmjFsC3Dq83u8GxwaK0",
         authDomain: "pawllos-c985f.firebaseapp.com",
         projectId: "pawllos-c985f",
-        storageBucket: "pawllos-c985f.firebaseapp.com",
+        storageBucket: "pawllos-c985f.appspot.com",
         messagingSenderId: "605956154730",
         appId: "1:605956154730:web:d0df6d427f92b581467113"
       };
@@ -108,10 +54,10 @@
 
       const uid = user.uid;
 
-      // Get user profile
+      // Get user data
       const userDoc = await db.collection("users").doc(uid).get();
       const userData = userDoc.data();
-      const profileHtml = `
+      const profileHTML = `
         <div class="profile-header">
           <img src="${userData.profilePic || 'https://placehold.co/100x100'}" alt="Profile Pic" />
           <div class="info">
@@ -121,9 +67,9 @@
           </div>
         </div>
       `;
-      document.getElementById("profileContainer").innerHTML = profileHtml;
+      document.getElementById("profileContainer").innerHTML = profileHTML;
 
-      // Pets Posted by User
+      // Posted Pets
       const petsSnap = await db.collection("pets").where("postedBy", "==", uid).get();
       let petsHTML = "";
       petsSnap.forEach(doc => {
@@ -138,23 +84,23 @@
       });
       document.getElementById("postedPets").innerHTML = petsHTML || "<p>No pets posted yet.</p>";
 
-      // Adoption History
-      const adoptionsSnap = await db.collection("adoptions").where("userId", "==", uid).get();
-      let adoptionsHTML = "";
-      adoptionsSnap.forEach(doc => {
-        const req = doc.data();
-        adoptionsHTML += `
+      // Adoption Requests
+      const adoptionSnap = await db.collection("adoptions").where("userId", "==", uid).get();
+      let adoptionHTML = "";
+      adoptionSnap.forEach(doc => {
+        const a = doc.data();
+        adoptionHTML += `
           <div class="card">
-            <p><strong>${req.petName}</strong> - ${req.status}</p>
-            <p>Reason: ${req.message}</p>
+            <p><strong>${a.petName}</strong> - ${a.status}</p>
+            <p>Reason: ${a.message}</p>
           </div>
         `;
       });
-      document.getElementById("adoptionHistory").innerHTML = adoptionsHTML || "<p>No adoption activity yet.</p>";
+      document.getElementById("adoptionHistory").innerHTML = adoptionHTML || "<p>No adoption activity yet.</p>";
     });
   </script>
 
-  <!-- Shared -->
+  <!-- Shared JS -->
   <script src="shared.js"></script>
 </body>
 </html>

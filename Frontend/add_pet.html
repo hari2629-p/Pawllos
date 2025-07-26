@@ -10,65 +10,8 @@
   <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js"></script>
 
-  <style>
-    body {
-      background-color: #fffaf4;
-      font-family: 'Segoe UI', sans-serif;
-      margin: 0;
-      padding: 2rem;
-      display: flex;
-      justify-content: center;
-    }
-
-    .form-container {
-      background-color: white;
-      padding: 2rem;
-      border-radius: 15px;
-      max-width: 600px;
-      width: 100%;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    }
-
-    h2 {
-      text-align: center;
-      color: #ff6f61;
-    }
-
-    label {
-      display: block;
-      margin-top: 1rem;
-      font-weight: 500;
-    }
-
-    input, select, textarea {
-      width: 100%;
-      padding: 0.7rem;
-      margin-top: 0.3rem;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      font-size: 1rem;
-    }
-
-    textarea {
-      resize: vertical;
-    }
-
-    button {
-      margin-top: 1.5rem;
-      width: 100%;
-      padding: 0.8rem;
-      background-color: #ff6f61;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      font-size: 1rem;
-      cursor: pointer;
-    }
-
-    button:hover {
-      background-color: #e55347;
-    }
-  </style>
+  <!-- External CSS -->
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
 
@@ -116,11 +59,15 @@
         apiKey: "AIzaSyBX10ONUiCc9NPrOmjFsC3Dq83u8GxwaK0",
         authDomain: "pawllos-c985f.firebaseapp.com",
         projectId: "pawllos-c985f",
-        storageBucket: "pawllos-c985f.firebaseapp.com",
+        storageBucket: "pawllos-c985f.appspot.com",
         messagingSenderId: "605956154730",
         appId: "1:605956154730:web:d0df6d427f92b581467113"
       };
-      firebase.initializeApp(firebaseConfig);
+
+      if (!firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
+      }
+
       const db = firebase.firestore();
       const auth = firebase.auth();
 
@@ -135,29 +82,31 @@
           e.preventDefault();
 
           const newPet = {
-            name: document.getElementById("name").value,
-            age: document.getElementById("age").value,
+            name: document.getElementById("name").value.trim(),
+            age: document.getElementById("age").value.trim(),
             type: document.getElementById("type").value,
-            location: document.getElementById("location").value,
-            image: document.getElementById("image").value,
+            location: document.getElementById("location").value.trim(),
+            image: document.getElementById("image").value.trim(),
             behaviorStyle: document.getElementById("behavior").value,
-            description: document.getElementById("notes").value,
+            description: document.getElementById("notes").value.trim(),
             postedBy: user.uid,
             createdAt: firebase.firestore.FieldValue.serverTimestamp()
           };
 
-          db.collection("pets").add(newPet).then(() => {
-            alert("✅ Pet posted successfully!");
-            window.location.href = "index.html";
-          }).catch(err => {
-            alert("❌ Error: " + err.message);
-          });
+          db.collection("pets").add(newPet)
+            .then(() => {
+              alert("✅ Pet posted successfully!");
+              window.location.href = "index.html";
+            })
+            .catch(err => {
+              alert("❌ Error: " + err.message);
+            });
         });
       });
     });
   </script>
 
-  <!-- Shared UI logic -->
+  <!-- Shared Navbar Logic -->
   <script src="shared.js"></script>
 </body>
 </html>

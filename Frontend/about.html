@@ -5,50 +5,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>About | Pawllos</title>
 
-  <!-- Firebase App (optional if you need auth context) -->
+  <!-- Firebase App -->
   <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js"></script>
 
-  <style>
-    body {
-      margin: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background-color: #fffaf4;
-      color: #333;
-    }
-
-    .about-container {
-      max-width: 800px;
-      margin: 2rem auto;
-      background: white;
-      padding: 2rem;
-      border-radius: 12px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.05);
-    }
-
-    h1 {
-      text-align: center;
-      color: #ff6f61;
-    }
-
-    p {
-      font-size: 1.1rem;
-      line-height: 1.6;
-      margin-top: 1rem;
-    }
-
-    footer {
-      text-align: center;
-      padding: 1rem;
-      color: #777;
-      font-size: 0.9rem;
-    }
-  </style>
+  <!-- External Styles -->
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
 
-  <div class="about-container">
+  <div class="container">
     <h1>About Pawllos</h1>
+
     <p><strong>Pawllos</strong> is a modern pet adoption platform designed to connect abandoned or stray animals with loving families. Through the use of AI-enhanced survey matching and a clean, user-friendly interface, we make pet adoption easier, smarter, and more compassionate.</p>
 
     <p>Whether you're a passionate animal lover or looking for your new furry friend, Pawllos helps match pets to your lifestyle using both your input and the pet’s behavior profile. Our platform ensures:</p>
@@ -67,7 +35,7 @@
     &copy; 2025 Pawllos | Made with ❤️ for animal lovers
   </footer>
 
-  <!-- Optional Shared JS (for nav/logout) -->
+  <!-- Shared Navbar & Auth -->
   <script src="shared.js"></script>
 </body>
 </html>

@@ -10,89 +10,8 @@
   <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore.js"></script>
 
-  <!-- CSS -->
-  <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      margin: 0;
-      background-color: #fefefe;
-    }
-
-    header {
-      background-color: #ff6f61;
-      padding: 1rem;
-      text-align: center;
-      color: white;
-    }
-
-    .filters {
-      padding: 1rem;
-      text-align: center;
-    }
-
-    .filters select {
-      padding: 0.5rem;
-      margin: 0 0.5rem;
-    }
-
-    .pet-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 1.5rem;
-      padding: 2rem;
-    }
-
-    .pet-card {
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      padding: 1rem;
-      background: white;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-      transition: transform 0.2s ease;
-    }
-
-    .pet-card:hover {
-      transform: scale(1.02);
-    }
-
-    .pet-card img {
-      width: 100%;
-      height: 180px;
-      object-fit: cover;
-      border-radius: 6px;
-    }
-
-    .pet-card h3 {
-      margin: 0.5rem 0 0;
-    }
-
-    .pet-card p {
-      margin: 0.25rem 0;
-      font-size: 0.9rem;
-    }
-
-    .adopt-btn {
-      display: inline-block;
-      margin-top: 0.5rem;
-      padding: 0.5rem 1rem;
-      background-color: #ff6f61;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      text-decoration: none;
-    }
-
-    .adopt-btn:hover {
-      background-color: #e55347;
-    }
-
-    footer {
-      text-align: center;
-      padding: 1rem;
-      font-size: 0.8rem;
-      color: #555;
-    }
-  </style>
+  <!-- External CSS -->
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
 
@@ -134,7 +53,10 @@
         appId: "1:605956154730:web:d0df6d427f92b581467113"
       };
 
-      firebase.initializeApp(firebaseConfig);
+      if (!firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
+      }
+
       const db = firebase.firestore();
       const auth = firebase.auth();
 
@@ -158,7 +80,6 @@
         const snap = await db.collection("pets").get();
         allPets = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-        // Initial render
         renderPets(allPets);
       });
 
@@ -204,7 +125,7 @@
     });
   </script>
 
-  <!-- Shared Nav -->
+  <!-- Shared Navbar + Logout -->
   <script src="shared.js"></script>
 </body>
 </html>

@@ -10,77 +10,8 @@
   <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js"></script>
 
-  <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background-color: #fffaf4;
-      margin: 0;
-      padding: 2rem;
-    }
-
-    h2 {
-      text-align: center;
-      color: #ff6f61;
-      margin-bottom: 2rem;
-    }
-
-    .request {
-      background-color: white;
-      border: 1px solid #eee;
-      padding: 1.5rem;
-      margin-bottom: 1rem;
-      border-radius: 10px;
-      box-shadow: 0 1px 6px rgba(0,0,0,0.05);
-    }
-
-    .request p {
-      margin: 0.4rem 0;
-    }
-
-    .status {
-      font-weight: bold;
-      color: #555;
-    }
-
-    .buttons {
-      margin-top: 1rem;
-    }
-
-    .buttons button {
-      padding: 0.5rem 1rem;
-      margin-right: 1rem;
-      border: none;
-      border-radius: 6px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: 0.3s ease;
-    }
-
-    .approve {
-      background-color: #4caf50;
-      color: white;
-    }
-
-    .reject {
-      background-color: #f44336;
-      color: white;
-    }
-
-    .approve:hover {
-      background-color: #388e3c;
-    }
-
-    .reject:hover {
-      background-color: #d32f2f;
-    }
-
-    footer {
-      text-align: center;
-      color: #777;
-      font-size: 0.9rem;
-      margin-top: 3rem;
-    }
-  </style>
+  <!-- External Styles -->
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
@@ -106,8 +37,7 @@
       const auth = firebase.auth();
 
       const container = document.getElementById("requestsContainer");
-
-      const adminEmail = "www.hariatl10@gmail.com"; // change this to your admin account
+      const adminEmail = "www.hariatl10@gmail.com"; // your admin email
 
       const user = await new Promise(resolve => auth.onAuthStateChanged(resolve));
       if (!user || user.email !== adminEmail) {
@@ -151,7 +81,7 @@
     }
   </script>
 
-  <!-- Shared navigation -->
+  <!-- Shared nav -->
   <script src="shared.js"></script>
 </body>
 </html>

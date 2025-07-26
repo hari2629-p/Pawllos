@@ -10,65 +10,8 @@
   <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js"></script>
 
-  <!-- Styles -->
-  <style>
-    body {
-      background-color: #fff3f2;
-      font-family: 'Segoe UI', sans-serif;
-      margin: 0;
-      padding: 2rem;
-      display: flex;
-      justify-content: center;
-    }
-
-    .survey-container {
-      background-color: white;
-      padding: 2rem 2.5rem;
-      border-radius: 15px;
-      max-width: 600px;
-      width: 100%;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    }
-
-    h2 {
-      text-align: center;
-      color: #ff6f61;
-      margin-bottom: 1.5rem;
-    }
-
-    label {
-      font-weight: 500;
-      display: block;
-      margin: 1rem 0 0.5rem;
-      color: #444;
-    }
-
-    select,
-    textarea {
-      width: 100%;
-      padding: 0.75rem;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-      font-size: 1rem;
-      resize: vertical;
-    }
-
-    button {
-      margin-top: 1.5rem;
-      width: 100%;
-      padding: 0.75rem;
-      background-color: #ff6f61;
-      color: white;
-      font-size: 1rem;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-    }
-
-    button:hover {
-      background-color: #ff3b2e;
-    }
-  </style>
+  <!-- External CSS -->
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
 
@@ -106,7 +49,7 @@
     </form>
   </div>
 
-  <!-- Firebase logic -->
+  <!-- Firebase Logic -->
   <script>
     document.addEventListener("DOMContentLoaded", function () {
       const firebaseConfig = {
@@ -117,13 +60,16 @@
         messagingSenderId: "605956154730",
         appId: "1:605956154730:web:d0df6d427f92b581467113"
       };
-      firebase.initializeApp(firebaseConfig);
+      if (!firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
+      }
+
       const db = firebase.firestore();
       const auth = firebase.auth();
 
       const form = document.getElementById("surveyForm");
 
-      form.addEventListener("submit", function (e) {
+      form.addEventListener("submit", async (e) => {
         e.preventDefault();
 
         const handling_style = document.getElementById("handling_style").value;
@@ -132,27 +78,30 @@
         const notes = document.getElementById("notes").value;
 
         const user = auth.currentUser;
-        if (user) {
-          db.collection("users").doc(user.uid).update({
+        if (!user) {
+          alert("Please log in first.");
+          return window.location.href = "login.html";
+        }
+
+        try {
+          await db.collection("users").doc(user.uid).update({
             preferences: {
               handling_style,
               pet_size,
               activity_level,
               notes
             }
-          }).then(() => {
-            alert("✅ Survey saved! Redirecting to homepage...");
-            window.location.href = "index.html";
-          }).catch(err => alert("Error: " + err.message));
-        } else {
-          alert("Please log in first.");
-          window.location.href = "login.html";
+          });
+          alert("✅ Survey saved! Redirecting to homepage...");
+          window.location.href = "index.html";
+        } catch (err) {
+          alert("❌ Error: " + err.message);
         }
       });
     });
   </script>
 
-  <!-- Shared nav/logic -->
+  <!-- Shared navbar logic -->
   <script src="shared.js"></script>
 </body>
 </html>

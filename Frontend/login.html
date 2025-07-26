@@ -10,73 +10,8 @@
   <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js"></script>
 
-  <!-- CSS Styling -->
-  <style>
-    body {
-      background-color: #fff3f2;
-      font-family: 'Segoe UI', sans-serif;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      margin: 0;
-    }
-
-    .login-box {
-      background-color: white;
-      padding: 2rem;
-      border-radius: 15px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-      width: 100%;
-      max-width: 400px;
-      text-align: center;
-    }
-
-    h2 {
-      margin-bottom: 1rem;
-      color: #ff6f61;
-    }
-
-    input {
-      width: 100%;
-      padding: 0.75rem;
-      margin: 0.5rem 0;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      font-size: 1rem;
-    }
-
-    button {
-      width: 100%;
-      background-color: #ff6f61;
-      color: white;
-      border: none;
-      padding: 0.8rem;
-      border-radius: 8px;
-      font-size: 1rem;
-      cursor: pointer;
-      margin-top: 1rem;
-      transition: background-color 0.3s ease;
-    }
-
-    button:hover {
-      background-color: #ff3b2e;
-    }
-
-    .signup-link {
-      margin-top: 1rem;
-      font-size: 0.9rem;
-    }
-
-    .signup-link a {
-      color: #ff6f61;
-      text-decoration: none;
-    }
-
-    .signup-link a:hover {
-      text-decoration: underline;
-    }
-  </style>
+  <!-- External CSS -->
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <div class="login-box">
@@ -121,7 +56,8 @@
     });
   </script>
 
-  <!-- Optional shared logic -->
   <script src="shared.js"></script>
 </body>
 </html>
+
+

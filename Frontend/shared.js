@@ -17,7 +17,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const auth = firebase.auth();
   const db = firebase.firestore();
 
-  // Add navbar
+  // Build navigation bar
   const currentPage = location.pathname.split("/").pop();
   const nav = document.createElement("nav");
   nav.style.cssText = `
@@ -31,7 +31,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   nav.innerHTML = `
     <div style="font-weight: bold; font-size: 1.3rem;">🐾 Pawllos</div>
-    <div>
+    <div id="nav-links">
       <a href="index.html" style="${navStyle('index.html')}">Home</a>
       <a href="add_pet.html" style="${navStyle('add_pet.html')}">Add Pet</a>
       <a href="about.html" style="${navStyle('about.html')}">About</a>
@@ -42,18 +42,37 @@ document.addEventListener("DOMContentLoaded", () => {
 
   document.body.insertBefore(nav, document.body.firstChild);
 
-  // Nav style helper
+  // Style active nav item
   function navStyle(filename) {
     const base = "margin: 0 0.8rem; color: white; text-decoration: none;";
     return currentPage === filename ? base + " text-decoration: underline;" : base;
   }
 
-  // Logout
+  // Logout functionality
   document.getElementById("logoutBtn").addEventListener("click", (e) => {
     e.preventDefault();
     auth.signOut().then(() => {
       alert("You have been logged out.");
       window.location.href = "login.html";
     });
+  });
+
+  // Auth listener for redirect protection & admin link injection
+  auth.onAuthStateChanged((user) => {
+    const allowedPages = ["login.html", "signup.html"];
+    const current = location.pathname.split("/").pop();
+
+    if (!user && !allowedPages.includes(current)) {
+      window.location.href = "login.html";
+    }
+
+    // Show Admin link only to the admin user
+    if (user?.email === "www.hariatl10@gmail.com") {
+      const adminLink = document.createElement("a");
+      adminLink.href = "admin.html";
+      adminLink.textContent = "Admin";
+      adminLink.style = navStyle('admin.html');
+      document.getElementById("nav-links").prepend(adminLink);
+    }
   });
 });
