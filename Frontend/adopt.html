@@ -5,12 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Adopt a Pet | Pawllos</title>
 
-  <!-- Firebase SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js"></script>
+  <!-- Firebase Compat SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore-compat.js"></script>
 
-  <!-- External Styles -->
+  <!-- External CSS -->
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
@@ -18,50 +18,48 @@
   <div class="form-container">
     <h2>Adoption Interest Form</h2>
     <form id="adoptForm">
-      <label for="petName">Pet Name</label>
+      <label>Pet Name</label>
       <input type="text" id="petName" readonly>
 
-      <label for="yourName">Your Name</label>
+      <label>Your Name</label>
       <input type="text" id="yourName" readonly>
 
-      <label for="email">Your Email</label>
+      <label>Your Email</label>
       <input type="email" id="email" readonly>
 
-      <label for="phone">Your Phone</label>
+      <label>Your Phone</label>
       <input type="text" id="phone" readonly>
 
-      <label for="message">Why do you want to adopt this pet?</label>
+      <label>Why do you want to adopt this pet?</label>
       <textarea id="message" rows="4" required></textarea>
 
-      <button type="submit">Submit Request</button>
+      <button type="submit">Submit</button>
     </form>
   </div>
 
   <!-- Firebase Logic -->
   <script>
-    document.addEventListener("DOMContentLoaded", async () => {
-      const firebaseConfig = {
-        apiKey: "AIzaSyBX10ONUiCc9NPrOmjFsC3Dq83u8GxwaK0",
-        authDomain: "pawllos-c985f.firebaseapp.com",
-        projectId: "pawllos-c985f",
-        storageBucket: "pawllos-c985f.firebaseapp.com",
-        messagingSenderId: "605956154730",
-        appId: "1:605956154730:web:d0df6d427f92b581467113"
-      };
+    const firebaseConfig = {
+      apiKey: "AIzaSyBX10ONUiCc9NPrOmjFsC3Dq83u8GxwaK0",
+      authDomain: "pawllos-c985f.firebaseapp.com",
+      projectId: "pawllos-c985f",
+      storageBucket: "pawllos-c985f.appspot.com",
+      messagingSenderId: "605956154730",
+      appId: "1:605956154730:web:d0df6d427f92b581467113"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const auth = firebase.auth();
 
-      if (!firebase.apps.length) {
-        firebase.initializeApp(firebaseConfig);
-      }
-
-      const db = firebase.firestore();
-      const auth = firebase.auth();
-
-      const petId = new URLSearchParams(window.location.search).get("pet");
+    document.addEventListener("DOMContentLoaded", async function () {
+      const params = new URLSearchParams(window.location.search);
+      const petId = params.get("pet");
 
       const user = await new Promise(resolve => auth.onAuthStateChanged(resolve));
       if (!user) {
         alert("Please log in to adopt a pet.");
-        return (window.location.href = "login.html");
+        window.location.href = "login.html";
+        return;
       }
 
       const userDoc = await db.collection("users").doc(user.uid).get();
@@ -73,14 +71,19 @@
 
       if (petId) {
         const petDoc = await db.collection("pets").doc(petId).get();
-        document.getElementById("petName").value = petDoc.exists ? petDoc.data().name : "Unknown Pet";
+        if (petDoc.exists) {
+          document.getElementById("petName").value = petDoc.data().name;
+        } else {
+          document.getElementById("petName").value = "Unknown Pet";
+        }
       }
 
-      document.getElementById("adoptForm").addEventListener("submit", (e) => {
+      // Handle form submission
+      document.getElementById("adoptForm").addEventListener("submit", async (e) => {
         e.preventDefault();
 
-        db.collection("adoptions").add({
-          petId,
+        await db.collection("adoptions").add({
+          petId: petId,
           petName: document.getElementById("petName").value,
           userId: user.uid,
           userName: userData.name,
@@ -89,17 +92,15 @@
           message: document.getElementById("message").value,
           status: "Pending",
           createdAt: firebase.firestore.FieldValue.serverTimestamp()
-        })
-        .then(() => {
-          alert("🎉 Your adoption request is under process!");
-          window.location.href = "index.html";
-        })
-        .catch(err => alert("❌ Error: " + err.message));
+        });
+
+        alert("🎉 Your adoption request is under process!");
+        window.location.href = "index.html";
       });
     });
   </script>
 
-  <!-- Shared Navbar -->
+  <!-- Shared navbar/logout -->
   <script src="shared.js"></script>
 </body>
 </html>

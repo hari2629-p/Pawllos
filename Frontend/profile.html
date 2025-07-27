@@ -5,46 +5,43 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>My Profile | Pawllos</title>
 
-  <!-- Firebase SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js"></script>
+  <!-- Firebase Compat SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore-compat.js"></script>
 
-  <!-- Shared Styles -->
-  <link rel="stylesheet" href="styles.css" />
+  <!-- External CSS -->
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
-  <!-- Profile Card -->
   <div id="profileContainer"></div>
 
-  <!-- Posted Pets -->
   <div class="section">
     <h3>🐶 Pets You Posted</h3>
     <div id="postedPets"></div>
   </div>
 
-  <!-- Adoption History -->
   <div class="section">
     <h3>📩 Your Adoption Requests</h3>
     <div id="adoptionHistory"></div>
   </div>
 
-  <!-- Firebase Script -->
   <script>
-    document.addEventListener("DOMContentLoaded", async () => {
-      const firebaseConfig = {
-        apiKey: "AIzaSyBX10ONUiCc9NPrOmjFsC3Dq83u8GxwaK0",
-        authDomain: "pawllos-c985f.firebaseapp.com",
-        projectId: "pawllos-c985f",
-        storageBucket: "pawllos-c985f.appspot.com",
-        messagingSenderId: "605956154730",
-        appId: "1:605956154730:web:d0df6d427f92b581467113"
-      };
-      firebase.initializeApp(firebaseConfig);
-      const db = firebase.firestore();
-      const auth = firebase.auth();
+    const firebaseConfig = {
+      apiKey: "AIzaSyBX10ONUiCc9NPrOmjFsC3Dq83u8GxwaK0",
+      authDomain: "pawllos-c985f.firebaseapp.com",
+      projectId: "pawllos-c985f",
+      storageBucket: "pawllos-c985f.appspot.com",
+      messagingSenderId: "605956154730",
+      appId: "1:605956154730:web:d0df6d427f92b581467113"
+    };
 
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const auth = firebase.auth();
+
+    document.addEventListener("DOMContentLoaded", async () => {
       const user = await new Promise(resolve => auth.onAuthStateChanged(resolve));
       if (!user) {
         alert("Please log in to view your profile.");
@@ -54,10 +51,10 @@
 
       const uid = user.uid;
 
-      // Get user data
+      // User Info
       const userDoc = await db.collection("users").doc(uid).get();
       const userData = userDoc.data();
-      const profileHTML = `
+      document.getElementById("profileContainer").innerHTML = `
         <div class="profile-header">
           <img src="${userData.profilePic || 'https://placehold.co/100x100'}" alt="Profile Pic" />
           <div class="info">
@@ -67,40 +64,45 @@
           </div>
         </div>
       `;
-      document.getElementById("profileContainer").innerHTML = profileHTML;
 
-      // Posted Pets
+      // Pets Posted
       const petsSnap = await db.collection("pets").where("postedBy", "==", uid).get();
-      let petsHTML = "";
-      petsSnap.forEach(doc => {
-        const pet = doc.data();
-        petsHTML += `
-          <div class="card">
-            <p><strong>${pet.name}</strong> (${pet.type}, ${pet.age})</p>
-            <p>Location: ${pet.location}</p>
-            <p>Behavior Style: ${pet.behaviorStyle}</p>
-          </div>
-        `;
-      });
-      document.getElementById("postedPets").innerHTML = petsHTML || "<p>No pets posted yet.</p>";
+      const petsContainer = document.getElementById("postedPets");
+      if (petsSnap.empty) {
+        petsContainer.innerHTML = "<p>No pets posted yet.</p>";
+      } else {
+        petsSnap.forEach(doc => {
+          const pet = doc.data();
+          petsContainer.innerHTML += `
+            <div class="card">
+              <p><strong>${pet.name}</strong> (${pet.type}, ${pet.age})</p>
+              <p>Location: ${pet.location}</p>
+              <p>Behavior Style: ${pet.behaviorStyle}</p>
+            </div>
+          `;
+        });
+      }
 
-      // Adoption Requests
+      // Adoption History
       const adoptionSnap = await db.collection("adoptions").where("userId", "==", uid).get();
-      let adoptionHTML = "";
-      adoptionSnap.forEach(doc => {
-        const a = doc.data();
-        adoptionHTML += `
-          <div class="card">
-            <p><strong>${a.petName}</strong> - ${a.status}</p>
-            <p>Reason: ${a.message}</p>
-          </div>
-        `;
-      });
-      document.getElementById("adoptionHistory").innerHTML = adoptionHTML || "<p>No adoption activity yet.</p>";
+      const historyContainer = document.getElementById("adoptionHistory");
+      if (adoptionSnap.empty) {
+        historyContainer.innerHTML = "<p>No adoption activity yet.</p>";
+      } else {
+        adoptionSnap.forEach(doc => {
+          const a = doc.data();
+          historyContainer.innerHTML += `
+            <div class="card">
+              <p><strong>${a.petName}</strong> - ${a.status}</p>
+              <p>Reason: ${a.message}</p>
+            </div>
+          `;
+        });
+      }
     });
   </script>
 
-  <!-- Shared JS -->
+  <!-- Shared nav -->
   <script src="shared.js"></script>
 </body>
 </html>
