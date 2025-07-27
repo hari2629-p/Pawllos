@@ -5,22 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Pawllos | Home</title>
 
-  <!-- Firebase -->
-<script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore-compat.js"></script>
-
+  <!-- Firebase Compat SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore-compat.js"></script>
 
   <!-- External CSS -->
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-
-  <!-- Header -->
-  <header>
-    <h1>🐾 Pawllos </h1>
-    <p>Find your perfect companion</p>
-  </header>
 
   <!-- Filter Dropdown -->
   <section class="filters">
@@ -34,99 +27,90 @@
 
   <!-- Pet Grid -->
   <section class="pet-grid" id="petGrid">
-    <!-- Cards will be injected -->
+    <!-- Cards will be injected here -->
   </section>
 
-  <!-- Footer -->
   <footer>
     &copy; 2025 Pawllos | Harigovind P. Nair
   </footer>
 
-  <!-- Firebase Logic -->
   <script>
-    document.addEventListener("DOMContentLoaded", async () => {
-      const firebaseConfig = {
-        apiKey: "AIzaSyBX10ONUiCc9NPrOmjFsC3Dq83u8GxwaK0",
-        authDomain: "pawllos-c985f.firebaseapp.com",
-        projectId: "pawllos-c985f",
-        storageBucket: "pawllos-c985f.firebaseapp.com",
-        messagingSenderId: "605956154730",
-        appId: "1:605956154730:web:d0df6d427f92b581467113"
-      };
+    const firebaseConfig = {
+      apiKey: "AIzaSyBX10ONUiCc9NPrOmjFsC3Dq83u8GxwaK0",
+      authDomain: "pawllos-c985f.firebaseapp.com",
+      projectId: "pawllos-c985f",
+      storageBucket: "pawllos-c985f.appspot.com",
+      messagingSenderId: "605956154730",
+      appId: "1:605956154730:web:d0df6d427f92b581467113"
+    };
 
-      if (!firebase.apps.length) {
-        firebase.initializeApp(firebaseConfig);
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const auth = firebase.auth();
+
+    let allPets = [];
+    let userStyle = "";
+
+    auth.onAuthStateChanged(async (user) => {
+      if (!user) {
+        alert("Please log in first.");
+        window.location.href = "login.html";
+        return;
       }
 
-      const db = firebase.firestore();
-      const auth = firebase.auth();
+      // Get user preferences
+      const userDoc = await db.collection("users").doc(user.uid).get();
+      if (userDoc.exists) {
+        userStyle = userDoc.data()?.preferences?.handling_style || "";
+      }
 
-      let allPets = [];
-      let userStyle = "";
+      // Get all pets
+      const snap = await db.collection("pets").get();
+      allPets = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-      auth.onAuthStateChanged(async (user) => {
-        if (!user) {
-          alert("Please log in first.");
-          window.location.href = "login.html";
-          return;
-        }
+      renderPets(allPets);
+    });
 
-        // Get user preference
-        const userDoc = await db.collection("users").doc(user.uid).get();
-        if (userDoc.exists) {
-          userStyle = userDoc.data()?.preferences?.handling_style || "";
-        }
+    function renderPets(list) {
+      const grid = document.getElementById("petGrid");
+      grid.innerHTML = "";
 
-        // Fetch pets
-        const snap = await db.collection("pets").get();
-        allPets = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-
-        renderPets(allPets);
+      const filtered = list.filter(p => {
+        if (!userStyle) return true;
+        return p.behaviorStyle === userStyle || userStyle === "care_oriented";
       });
 
-      // Render cards
-      function renderPets(list) {
-        const grid = document.getElementById("petGrid");
-        grid.innerHTML = "";
-
-        const filteredList = list.filter(p => {
-          if (!userStyle) return true;
-          return (p.behaviorStyle === userStyle || userStyle === "care_oriented");
-        });
-
-        if (filteredList.length === 0) {
-          grid.innerHTML = "<p>No pets match your preferences.</p>";
-          return;
-        }
-
-        filteredList.forEach(pet => {
-          const card = document.createElement("div");
-          card.className = "pet-card";
-          card.innerHTML = `
-            <img src="${pet.image}" alt="${pet.name}">
-            <h3>${pet.name}</h3>
-            <p>Age: ${pet.age}</p>
-            <p>Type: ${pet.type}</p>
-            <p>Location: ${pet.location}</p>
-            <a class="adopt-btn" href="adopt.html?pet=${pet.id}">Adopt Me</a>
-          `;
-          grid.appendChild(card);
-        });
+      if (filtered.length === 0) {
+        grid.innerHTML = "<p>No pets match your preferences yet.</p>";
+        return;
       }
 
-      // Filter by dropdown
-      window.filterPets = function () {
-        const val = document.getElementById("type").value;
-        if (val === "all") {
-          renderPets(allPets);
-        } else {
-          renderPets(allPets.filter(p => p.type === val));
-        }
-      };
-    });
+      filtered.forEach(pet => {
+        const card = document.createElement("div");
+        card.className = "pet-card";
+        card.innerHTML = `
+          <img src="${pet.image}" alt="${pet.name}">
+          <h3>${pet.name}</h3>
+          <p>Age: ${pet.age}</p>
+          <p>Type: ${pet.type}</p>
+          <p>Location: ${pet.location}</p>
+          <a class="adopt-btn" href="adopt.html?pet=${pet.id}">Adopt Me</a>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    window.filterPets = function () {
+      const selected = document.getElementById("type").value;
+      if (selected === "all") {
+        renderPets(allPets);
+      } else {
+        renderPets(allPets.filter(p => p.type === selected));
+      }
+    };
   </script>
 
-  <!-- Shared Navbar + Logout -->
+  <!-- Shared Navigation -->
   <script src="shared.js"></script>
 </body>
 </html>

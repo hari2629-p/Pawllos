@@ -5,14 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Survey | Pawllos</title>
 
-  <!-- Firebase SDKs -->
   <!-- Firebase Compat SDKs -->
-<script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore-compat.js"></script>
 
   <!-- External CSS -->
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
@@ -22,9 +21,9 @@
       <label for="handling_style">Your Pet Handling Style</label>
       <select id="handling_style" required>
         <option value="">--Select--</option>
-        <option value="care_oriented">Care-Oriented (compassionate and nurturing)</option>
-        <option value="guard_oriented">Guard-Oriented (prefers alert, protective pets)</option>
-        <option value="emotional_core">Emotional Core (deep bond, empathy driven)</option>
+        <option value="care_oriented">Care-Oriented (nurturing)</option>
+        <option value="guard_oriented">Guard-Oriented (alert, protective)</option>
+        <option value="emotional_core">Emotional Core (empathetic bond)</option>
       </select>
 
       <label for="pet_size">Preferred Pet Size</label>
@@ -39,8 +38,8 @@
       <select id="activity_level" required>
         <option value="">--Select--</option>
         <option value="low">Low (indoor, calm)</option>
-        <option value="moderate">Moderate (regular walks/play)</option>
-        <option value="high">High (energetic, needs space)</option>
+        <option value="moderate">Moderate (walks/play)</option>
+        <option value="high">High (energetic)</option>
       </select>
 
       <label for="notes">Additional Notes (optional)</label>
@@ -50,59 +49,53 @@
     </form>
   </div>
 
-  <!-- Firebase Logic -->
   <script>
-    document.addEventListener("DOMContentLoaded", function () {
-      const firebaseConfig = {
-        apiKey: "AIzaSyBX10ONUiCc9NPrOmjFsC3Dq83u8GxwaK0",
-        authDomain: "pawllos-c985f.firebaseapp.com",
-        projectId: "pawllos-c985f",
-        storageBucket: "pawllos-c985f.firebaseapp.com",
-        messagingSenderId: "605956154730",
-        appId: "1:605956154730:web:d0df6d427f92b581467113"
-      };
-      if (!firebase.apps.length) {
-        firebase.initializeApp(firebaseConfig);
+    const firebaseConfig = {
+      apiKey: "AIzaSyBX10ONUiCc9NPrOmjFsC3Dq83u8GxwaK0",
+      authDomain: "pawllos-c985f.firebaseapp.com",
+      projectId: "pawllos-c985f",
+      storageBucket: "pawllos-c985f.appspot.com",
+      messagingSenderId: "605956154730",
+      appId: "1:605956154730:web:d0df6d427f92b581467113"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const auth = firebase.auth();
+
+    document.getElementById("surveyForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const user = auth.currentUser;
+
+      if (!user) {
+        alert("Please log in first.");
+        window.location.href = "login.html";
+        return;
       }
 
-      const db = firebase.firestore();
-      const auth = firebase.auth();
+      const handling_style = document.getElementById("handling_style").value;
+      const pet_size = document.getElementById("pet_size").value;
+      const activity_level = document.getElementById("activity_level").value;
+      const notes = document.getElementById("notes").value;
 
-      const form = document.getElementById("surveyForm");
-
-      form.addEventListener("submit", async (e) => {
-        e.preventDefault();
-
-        const handling_style = document.getElementById("handling_style").value;
-        const pet_size = document.getElementById("pet_size").value;
-        const activity_level = document.getElementById("activity_level").value;
-        const notes = document.getElementById("notes").value;
-
-        const user = auth.currentUser;
-        if (!user) {
-          alert("Please log in first.");
-          return window.location.href = "login.html";
-        }
-
-        try {
-          await db.collection("users").doc(user.uid).update({
-            preferences: {
-              handling_style,
-              pet_size,
-              activity_level,
-              notes
-            }
-          });
-          alert("✅ Survey saved! Redirecting to homepage...");
-          window.location.href = "index.html";
-        } catch (err) {
-          alert("❌ Error: " + err.message);
-        }
-      });
+      try {
+        await db.collection("users").doc(user.uid).update({
+          preferences: {
+            handling_style,
+            pet_size,
+            activity_level,
+            notes
+          }
+        });
+        alert("✅ Survey submitted! Redirecting to homepage...");
+        window.location.href = "index.html";
+      } catch (err) {
+        alert("❌ Error: " + err.message);
+      }
     });
   </script>
 
-  <!-- Shared navbar logic -->
+  <!-- Shared Navbar -->
   <script src="shared.js"></script>
 </body>
 </html>

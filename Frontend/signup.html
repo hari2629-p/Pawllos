@@ -4,95 +4,62 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Signup | Pawllos</title>
-
-  <!-- Firebase SDKs -->
-<script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore-compat.js"></script>
-
-
-  <!-- External CSS -->
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles.css" />
+  <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore-compat.js"></script>
 </head>
 <body>
-
   <div class="signup-container">
     <h2>Create an Account</h2>
     <form id="signupForm">
       <label for="name">Full Name</label>
       <input type="text" id="name" required>
-
       <label for="email">Email</label>
       <input type="email" id="email" required>
-
       <label for="phone">Phone Number</label>
       <input type="text" id="phone" required>
-
       <label for="password">Password</label>
       <input type="password" id="password" required>
-
       <label for="profilePic">Profile Picture URL (optional)</label>
-      <input type="url" id="profilePic" placeholder="https://example.com/photo.jpg">
-
+      <input type="url" id="profilePic">
       <button type="submit">Sign Up</button>
     </form>
-
-    <div class="login-link">
-      Already have an account? <a href="login.html">Log in</a>
-    </div>
+    <div class="login-link">Already have an account? <a href="login.html">Log in</a></div>
   </div>
 
-  <!-- Firebase Config & Signup Logic -->
   <script>
-    document.addEventListener("DOMContentLoaded", function () {
-      const firebaseConfig = {
-        apiKey: "AIzaSyBX10ONUiCc9NPrOmjFsC3Dq83u8GxwaK0",
-        authDomain: "pawllos-c985f.firebaseapp.com",
-        projectId: "pawllos-c985f",
-        storageBucket: "pawllos-c985f.appspot.com",
-        messagingSenderId: "605956154730",
-        appId: "1:605956154730:web:d0df6d427f92b581467113"
-      };
+    const firebaseConfig = {
+      apiKey: "AIzaSyBX10ONUiCc9NPrOmjFsC3Dq83u8GxwaK0",
+      authDomain: "pawllos-c985f.firebaseapp.com",
+      projectId: "pawllos-c985f",
+      storageBucket: "pawllos-c985f.appspot.com",
+      messagingSenderId: "605956154730",
+      appId: "1:605956154730:web:d0df6d427f92b581467113"
+    };
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const auth = firebase.auth();
 
-      if (!firebase.apps.length) {
-        firebase.initializeApp(firebaseConfig);
-      }
+    document.getElementById("signupForm").addEventListener("submit", function (e) {
+      e.preventDefault();
+      const name = document.getElementById("name").value;
+      const email = document.getElementById("email").value;
+      const phone = document.getElementById("phone").value;
+      const password = document.getElementById("password").value;
+      const profilePic = document.getElementById("profilePic").value;
 
-      const db = firebase.firestore();
-      const auth = firebase.auth();
-
-      const form = document.getElementById("signupForm");
-      form.addEventListener("submit", function (e) {
-        e.preventDefault();
-
-        const name = document.getElementById("name").value;
-        const email = document.getElementById("email").value;
-        const phone = document.getElementById("phone").value;
-        const password = document.getElementById("password").value;
-        const profilePic = document.getElementById("profilePic").value;
-
-        auth.createUserWithEmailAndPassword(email, password)
-          .then((cred) => {
-            return db.collection("users").doc(cred.user.uid).set({
-              name,
-              email,
-              phone,
-              profilePic,
-              createdAt: firebase.firestore.FieldValue.serverTimestamp()
-            });
-          })
-          .then(() => {
-            alert("🎉 Account created! Redirecting to survey...");
-            window.location.href = "survey.html";
-          })
-          .catch(err => {
-            alert("❌ " + err.message);
-          });
-      });
+      auth.createUserWithEmailAndPassword(email, password)
+        .then(cred => db.collection("users").doc(cred.user.uid).set({
+          name, email, phone, profilePic, createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        }))
+        .then(() => {
+          alert("🎉 Account created! Redirecting to survey...");
+          window.location.href = "survey.html";
+        })
+        .catch(err => alert("❌ " + err.message));
     });
   </script>
-
-  <!-- Shared navbar/logout (optional) -->
   <script src="shared.js"></script>
 </body>
 </html>

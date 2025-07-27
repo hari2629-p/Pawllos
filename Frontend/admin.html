@@ -1,87 +1,49 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Admin Panel | Pawllos</title>
+<!-- Same Firebase SDKs and styles as others -->
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyBX10ONUiCc9NPrOmjFsC3Dq83u8GxwaK0",
+    authDomain: "pawllos-c985f.firebaseapp.com",
+    projectId: "pawllos-c985f",
+    storageBucket: "pawllos-c985f.appspot.com",
+    messagingSenderId: "605956154730",
+    appId: "1:605956154730:web:d0df6d427f92b581467113"
+  };
+  if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+  const auth = firebase.auth();
 
-  <!-- Firebase SDKs -->
-<script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore-compat.js"></script>
+  document.addEventListener("DOMContentLoaded", async () => {
+    const user = await new Promise(resolve => auth.onAuthStateChanged(resolve));
+    if (!user || user.email !== "www.hariatl10@gmail.com") {
+      alert("Access denied.");
+      return (window.location.href = "index.html");
+    }
 
-  <!-- External Styles -->
-  <link rel="stylesheet" href="styles.css">
-</head>
-<body>
+    const container = document.getElementById("requestsContainer");
+    const snap = await db.collection("adoptions").orderBy("createdAt", "desc").get();
+    if (snap.empty) return container.innerHTML = "<p>No requests yet.</p>";
 
-  <h2>🐾 Admin - Adoption Requests</h2>
-  <div id="requestsContainer"></div>
-
-  <footer>
-    &copy; 2025 Pawllos | Admin Portal
-  </footer>
-
-  <script>
-    document.addEventListener("DOMContentLoaded", async () => {
-      const firebaseConfig = {
-        apiKey: "AIzaSyBX10ONUiCc9NPrOmjFsC3Dq83u8GxwaK0",
-        authDomain: "pawllos-c985f.firebaseapp.com",
-        projectId: "pawllos-c985f",
-        storageBucket: "pawllos-c985f.firebaseapp.com",
-        messagingSenderId: "605956154730",
-        appId: "1:605956154730:web:d0df6d427f92b581467113"
-      };
-      firebase.initializeApp(firebaseConfig);
-      const db = firebase.firestore();
-      const auth = firebase.auth();
-
-      const container = document.getElementById("requestsContainer");
-      const adminEmail = "www.hariatl10@gmail.com"; // your admin email
-
-      const user = await new Promise(resolve => auth.onAuthStateChanged(resolve));
-      if (!user || user.email !== adminEmail) {
-        alert("Access denied. You are not authorized.");
-        window.location.href = "index.html";
-        return;
-      }
-
-      const snap = await db.collection("adoptions").orderBy("createdAt", "desc").get();
-
-      if (snap.empty) {
-        container.innerHTML = "<p>No adoption requests yet.</p>";
-        return;
-      }
-
-      snap.forEach(doc => {
-        const data = doc.data();
-        const div = document.createElement("div");
-        div.className = "request";
-        div.innerHTML = `
-          <p><strong>Pet:</strong> ${data.petName}</p>
-          <p><strong>User:</strong> ${data.userName}</p>
-          <p><strong>Email:</strong> ${data.email}</p>
-          <p><strong>Phone:</strong> ${data.phone}</p>
-          <p><strong>Reason:</strong> ${data.message}</p>
-          <p class="status">Status: <span id="status-${doc.id}">${data.status}</span></p>
+    snap.forEach(doc => {
+      const d = doc.data();
+      container.innerHTML += `
+        <div class="request">
+          <p><strong>Pet:</strong> ${d.petName}</p>
+          <p><strong>User:</strong> ${d.userName}</p>
+          <p><strong>Email:</strong> ${d.email}</p>
+          <p><strong>Phone:</strong> ${d.phone}</p>
+          <p><strong>Reason:</strong> ${d.message}</p>
+          <p class="status">Status: <span id="status-${doc.id}">${d.status}</span></p>
           <div class="buttons">
             <button class="approve" onclick="updateStatus('${doc.id}', 'Approved')">Approve</button>
             <button class="reject" onclick="updateStatus('${doc.id}', 'Rejected')">Reject</button>
           </div>
-        `;
-        container.appendChild(div);
-      });
+        </div>`;
     });
+  });
 
-    async function updateStatus(id, newStatus) {
-      const db = firebase.firestore();
-      await db.collection("adoptions").doc(id).update({ status: newStatus });
-      document.getElementById("status-" + id).textContent = newStatus;
-      alert("Status updated to " + newStatus);
-    }
-  </script>
-
-  <!-- Shared nav -->
-  <script src="shared.js"></script>
-</body>
-</html>
+  async function updateStatus(id, status) {
+    await db.collection("adoptions").doc(id).update({ status });
+    document.getElementById("status-" + id).textContent = status;
+    alert("Updated to " + status);
+  }
+</script>

@@ -5,13 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Login | Pawllos</title>
   <link rel="stylesheet" href="styles.css" />
-
-  <!-- Firebase -->
-   <!-- Firebase Compat SDKs -->
-<script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore-compat.js"></script>
-
+  <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore-compat.js"></script>
 </head>
 <body>
   <div class="login-box">
@@ -35,7 +31,7 @@
       messagingSenderId: "605956154730",
       appId: "1:605956154730:web:d0df6d427f92b581467113"
     };
-    firebase.initializeApp(firebaseConfig);
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.firestore();
 
@@ -46,21 +42,14 @@
 
       try {
         const cred = await auth.signInWithEmailAndPassword(email, password);
-        const uid = cred.user.uid;
-        const userDoc = await db.collection("users").doc(uid).get();
+        const userDoc = await db.collection("users").doc(cred.user.uid).get();
         const prefs = userDoc.data().preferences;
-
-        if (prefs && prefs.handling_style) {
-          // Already completed survey
-          window.location.href = "index.html";
-        } else {
-          // No survey data
-          window.location.href = "survey.html";
-        }
+        window.location.href = prefs?.handling_style ? "index.html" : "survey.html";
       } catch (err) {
         alert("❌ Login failed: " + err.message);
       }
     });
   </script>
+  <script src="shared.js"></script>
 </body>
 </html>
