@@ -48,12 +48,15 @@
         apiKey: "AIzaSyBX10ONUiCc9NPrOmjFsC3Dq83u8GxwaK0",
         authDomain: "pawllos-c985f.firebaseapp.com",
         projectId: "pawllos-c985f",
-        storageBucket: "pawllos-c985f.firebaseapp.com",
+        storageBucket: "pawllos-c985f.appspot.com",
         messagingSenderId: "605956154730",
         appId: "1:605956154730:web:d0df6d427f92b581467113"
       };
 
-      firebase.initializeApp(firebaseConfig);
+      if (!firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
+      }
+
       const db = firebase.firestore();
       const auth = firebase.auth();
 
@@ -78,10 +81,12 @@
             });
           })
           .then(() => {
-            alert("✅ Signup successful! Redirecting to survey...");
+            alert("🎉 Account created! Redirecting to survey...");
             window.location.href = "survey.html";
           })
-          .catch(err => alert("❌ " + err.message));
+          .catch(err => {
+            alert("❌ " + err.message);
+          });
       });
     });
   </script>
